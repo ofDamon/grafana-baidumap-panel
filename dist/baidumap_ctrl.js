@@ -3,7 +3,7 @@
 System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn', 'lodash', './map_renderer', './data_formatter', './libs/baidumap.js'], function (_export, _context) {
   "use strict";
 
-  var MetricsPanelCtrl, TimeSeries, kbn, _, mapRenderer, DataFormatter, MP, _createClass, panelDefaults, WorldmapCtrl;
+  var MetricsPanelCtrl, TimeSeries, kbn, _, mapRenderer, DataFormatter, MP, _createClass, panelDefaults, BaidumapCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -87,13 +87,13 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         mapType: true
       };
 
-      WorldmapCtrl = function (_MetricsPanelCtrl) {
-        _inherits(WorldmapCtrl, _MetricsPanelCtrl);
+      BaidumapCtrl = function (_MetricsPanelCtrl) {
+        _inherits(BaidumapCtrl, _MetricsPanelCtrl);
 
-        function WorldmapCtrl($scope, $injector, contextSrv) {
-          _classCallCheck(this, WorldmapCtrl);
+        function BaidumapCtrl($scope, $injector, contextSrv) {
+          _classCallCheck(this, BaidumapCtrl);
 
-          var _this = _possibleConstructorReturn(this, (WorldmapCtrl.__proto__ || Object.getPrototypeOf(WorldmapCtrl)).call(this, $scope, $injector));
+          var _this = _possibleConstructorReturn(this, (BaidumapCtrl.__proto__ || Object.getPrototypeOf(BaidumapCtrl)).call(this, $scope, $injector));
 
           _this.setMapProvider(contextSrv);
           _.defaults(_this.panel, panelDefaults);
@@ -108,7 +108,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           return _this;
         }
 
-        _createClass(WorldmapCtrl, [{
+        _createClass(BaidumapCtrl, [{
           key: 'setMapProvider',
           value: function setMapProvider(contextSrv) {
             //    this.tileServer = contextSrv.user.lightTheme ? 'CartoDB Positron' : 'CartoDB Dark';
@@ -323,12 +323,12 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           }
         }]);
 
-        return WorldmapCtrl;
+        return BaidumapCtrl;
       }(MetricsPanelCtrl);
 
-      _export('default', WorldmapCtrl);
+      _export('default', BaidumapCtrl);
 
-      WorldmapCtrl.templateUrl = 'module.html';
+      BaidumapCtrl.templateUrl = 'module.html';
     }
   };
 });

@@ -25,7 +25,7 @@ const panelDefaults = {
   mapType: true
 };
 
-export default class WorldmapCtrl extends MetricsPanelCtrl {
+export default class BaidumapCtrl extends MetricsPanelCtrl {
   constructor($scope, $injector, contextSrv) {
     super($scope, $injector);
 
@@ -234,4 +234,4 @@ export default class WorldmapCtrl extends MetricsPanelCtrl {
   }
 }
 
-WorldmapCtrl.templateUrl = 'module.html';
+BaidumapCtrl.templateUrl = 'module.html';
