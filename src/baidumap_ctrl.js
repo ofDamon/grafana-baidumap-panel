@@ -6,7 +6,6 @@ import kbn from 'app/core/utils/kbn';
 import _ from 'lodash';
 import mapRenderer from './map_renderer';
 import DataFormatter from './data_formatter';
-import { MP } from "./libs/baidumap.js";  
 
 const panelDefaults = {
   ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
