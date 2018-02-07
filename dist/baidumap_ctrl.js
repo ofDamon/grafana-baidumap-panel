@@ -131,17 +131,12 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               return;
             }
 
-            if (this.panel.locationData === "jsonp endpoint") {
-              console.log(1);
-            } else if (this.panel.locationData === "json endpoint") {
+            if (this.panel.locationData === "jsonp endpoint") {} else if (this.panel.locationData === "json endpoint") {
               if (!this.panel.jsonUrl) return;
-              console.log(2);
             } else if (this.panel.locationData === "table") {
               // .. Do nothing
-              console.log(3);
-            } else if (this.panel.locationData !== "geohash" && this.panel.locationData !== "json result") {
-              console.log(4);
-            }
+
+            } else if (this.panel.locationData !== "geohash" && this.panel.locationData !== "json result") {}
           }
         }, {
           key: 'reloadLocations',

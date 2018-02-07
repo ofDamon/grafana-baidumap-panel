@@ -21,7 +21,6 @@ System.register(['./css/leaflet.css!', './libs/baidumap.js'], function (_export,
 
       if (!ctrl.map) {
         MP(ctrl.panel.ak).then(function (BMap) {
-          console.log(ctrl.panel);
           var elementId = "mapid_" + ctrl.panel.id;
           ctrl.map = new BMap.Map(elementId);
           ctrl.map.centerAndZoom(new BMap.Point(ctrl.panel.lng, ctrl.panel.lat), parseInt(ctrl.panel.initialZoom, 10));

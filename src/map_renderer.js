@@ -36,7 +36,7 @@ export default function link(scope, elem, attrs, ctrl) {
         if(ctrl.panel.mapType === true)ctrl.map.addControl(ctrl.mapTypeSwitch);
 
         ctrl.map.addEventListener("dragend", function() {
-          var center = ctrl.map.getCenter();
+          const center = ctrl.map.getCenter();
           ctrl.panel.lat = center.lat;
           ctrl.panel.lng = center.lng;
         });
