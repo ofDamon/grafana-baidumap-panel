@@ -72,8 +72,8 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
         maxDataPoints: 1,
         theme: "normal",
-        mapCenterLatitude: 116.404,
-        mapCenterLongitude: 39.915,
+        lat: 39.915,
+        lng: 116.404,
         initialZoom: 11,
         valueName: "total",
         locationData: "countries",
@@ -101,7 +101,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           _this.events.on('data-received', _this.onDataReceived.bind(_this));
           _this.events.on('panel-teardown', _this.onPanelTeardown.bind(_this));
           _this.events.on('data-snapshot-load', _this.onDataSnapshotLoad.bind(_this));
-
           //this.loadLocationDataFromFile();
           return _this;
         }
@@ -125,8 +124,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         }, {
           key: 'loadLocationDataFromFile',
           value: function loadLocationDataFromFile(reload) {
-            var _this2 = this;
-
             if (this.map && !reload) return;
 
             if (this.panel.snapshotLocationData) {
@@ -135,30 +132,15 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             }
 
             if (this.panel.locationData === "jsonp endpoint") {
-              if (!this.panel.jsonpUrl || !this.panel.jsonpCallback) return;
-
-              window.$.ajax({
-                type: "GET",
-                url: this.panel.jsonpUrl + "?callback=?",
-                contentType: "application/json",
-                jsonpCallback: this.panel.jsonpCallback,
-                dataType: "jsonp",
-                success: function success(res) {
-                  _this2.locations = res;
-                  _this2.render();
-                }
-              });
+              console.log(1);
             } else if (this.panel.locationData === "json endpoint") {
               if (!this.panel.jsonUrl) return;
-
-              window.$.getJSON(this.panel.jsonUrl).then(function (res) {
-                _this2.locations = res;
-                _this2.render();
-              });
+              console.log(2);
             } else if (this.panel.locationData === "table") {
               // .. Do nothing
+              console.log(3);
             } else if (this.panel.locationData !== "geohash" && this.panel.locationData !== "json result") {
-              window.$.getJSON("public/plugins/grafana-worldmap-panel/data/" + this.panel.locationData + ".json").then(this.reloadLocations.bind(this));
+              console.log(4);
             }
           }
         }, {
@@ -170,7 +152,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         }, {
           key: 'onPanelTeardown',
           value: function onPanelTeardown() {
-            if (this.map) this.map.remove();
+            if (this.map) delete this.map;
           }
         }, {
           key: 'onInitEditMode',
@@ -181,19 +163,17 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           key: 'onDataReceived',
           value: function onDataReceived(dataList) {
             if (!dataList) return;
-
             if (this.dashboard.snapshot && this.locations) {
               this.panel.snapshotLocationData = this.locations;
             }
 
             var data = [];
-
-            if (this.panel.locationData === 'geohash') {
+            if (this.panel.locationData === "geohash") {
               this.dataFormatter.setGeohashValues(dataList, data);
-            } else if (this.panel.locationData === 'table') {
+            } else if (this.panel.locationData === "table") {
               var tableData = dataList.map(DataFormatter.tableHandler.bind(this));
               this.dataFormatter.setTableValues(tableData, data);
-            } else if (this.panel.locationData === 'json result') {
+            } else if (this.panel.locationData === "json result") {
               this.series = dataList;
               this.dataFormatter.setJsonValues(data);
             } else {
@@ -201,8 +181,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               this.dataFormatter.setValues(data);
             }
             this.data = data;
-
-            if (this.data.length && this.panel.mapCenter === 'Last GeoHash') {
+            if (this.data.length) {
               this.centerOnLastGeoHash();
             } else {
               this.render();
@@ -211,8 +190,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         }, {
           key: 'centerOnLastGeoHash',
           value: function centerOnLastGeoHash() {
-            mapCenters[this.panel.mapCenter].mapCenterLatitude = _.last(this.data).locationLatitude;
-            mapCenters[this.panel.mapCenter].mapCenterLongitude = _.last(this.data).locationLongitude;
             this.setNewMapCenter();
           }
         }, {
@@ -234,11 +211,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         }, {
           key: 'setNewMapCenter',
           value: function setNewMapCenter() {
-            if (this.panel.mapCenter !== 'custom') {
-              this.panel.mapCenterLatitude = mapCenters[this.panel.mapCenter].mapCenterLatitude;
-              this.panel.mapCenterLongitude = mapCenters[this.panel.mapCenter].mapCenterLongitude;
-            }
-            this.mapCenterMoved = true;
             this.render();
           }
         }, {
@@ -265,36 +237,36 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           key: 'navigationControl',
           value: function navigationControl() {
             if (this.panel.navigation == true) {
-              this.map.addControl(this.panel.navigationSwitch);
+              this.map.addControl(this.navigationSwitch);
             } else {
-              this.map.removeControl(this.panel.navigationSwitch);
+              this.map.removeControl(this.navigationSwitch);
             }
           }
         }, {
           key: 'scaleControl',
           value: function scaleControl() {
             if (this.panel.scale == true) {
-              this.map.addControl(this.panel.scaleSwitch);
+              this.map.addControl(this.scaleSwitch);
             } else {
-              this.map.removeControl(this.panel.scaleSwitch);
+              this.map.removeControl(this.scaleSwitch);
             }
           }
         }, {
           key: 'overviewMapControl',
           value: function overviewMapControl() {
             if (this.panel.overviewMap == true) {
-              this.map.addControl(this.panel.overviewMapSwitch);
+              this.map.addControl(this.overviewMapSwitch);
             } else {
-              this.map.removeControl(this.panel.overviewMapSwitch);
+              this.map.removeControl(this.overviewMapSwitch);
             }
           }
         }, {
           key: 'mapTypeControl',
           value: function mapTypeControl() {
             if (this.panel.mapType == true) {
-              this.map.addControl(this.panel.mapTypeSwitch);
+              this.map.addControl(this.mapTypeSwitch);
             } else {
-              this.map.removeControl(this.panel.mapTypeSwitch);
+              this.map.removeControl(this.mapTypeSwitch);
             }
           }
         }, {
@@ -308,8 +280,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         }, {
           key: 'changeLocationData',
           value: function changeLocationData() {
-            this.loadLocationDataFromFile(true);
-
             if (this.panel.locationData === 'geohash') {
               this.render();
             }

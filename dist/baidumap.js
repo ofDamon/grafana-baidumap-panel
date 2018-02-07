@@ -256,12 +256,12 @@ System.register(['lodash', './libs/leaflet', './libs/baidumap.js'], function (_e
 				}, {
 					key: 'resize',
 					value: function resize() {
-						console.log(111);
+						this.map.invalidateSize();
 					}
 				}, {
 					key: 'panToMapCenter',
 					value: function panToMapCenter() {
-						this.map.panTo([parseFloat(this.ctrl.panel.mapCenterLatitude), parseFloat(this.ctrl.panel.mapCenterLongitude)]);
+						this.map.panTo([parseFloat(this.ctrl.panel.lat), parseFloat(this.ctrl.panel.lng)]);
 						this.ctrl.mapCenterMoved = false;
 					}
 				}, {
@@ -283,7 +283,6 @@ System.register(['lodash', './libs/leaflet', './libs/baidumap.js'], function (_e
 				}, {
 					key: 'setZoom',
 					value: function setZoom(zoomFactor) {
-						console.log(2323);
 						this.map.setZoom(parseInt(zoomFactor, 10));
 					}
 				}, {

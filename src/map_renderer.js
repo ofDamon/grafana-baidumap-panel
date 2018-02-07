@@ -1,5 +1,4 @@
 import './css/leaflet.css!';
-import BaiduMap from './baidumap';
 import { MP } from "./libs/baidumap.js";  
 
 
@@ -11,7 +10,7 @@ export default function link(scope, elem, attrs, ctrl) {
 
   function render() {
     if (!ctrl.data) return;
-
+  
     const mapContainer = elem.find('.mapcontainer');
 
     if (mapContainer[0].id.indexOf('{{') > -1) {
@@ -20,21 +19,27 @@ export default function link(scope, elem, attrs, ctrl) {
 
     if (!ctrl.map) {
       MP(ctrl.panel.ak).then(BMap => {
-        console.log(ctrl.panel);
         const elementId = "mapid_" + ctrl.panel.id;
         ctrl.map = new BMap.Map(elementId);
-        ctrl.map.centerAndZoom(new BMap.Point(ctrl.panel.mapCenterLatitude, ctrl.panel.mapCenterLongitude), ctrl.panel.initialZoom);
+        ctrl.map.centerAndZoom(new BMap.Point(ctrl.panel.lng, ctrl.panel.lat), parseInt(ctrl.panel.initialZoom, 10));
         ctrl.map.enableScrollWheelZoom();
+        ctrl.map.setMapStyle({ style: ctrl.panel.theme });
 
-        ctrl.panel.navigationSwitch = new BMap.NavigationControl();
-        ctrl.panel.scaleSwitch = new BMap.ScaleControl();
-        ctrl.panel.overviewMapSwitch = new BMap.OverviewMapControl({isOpen:true, anchor: BMAP_ANCHOR_BOTTOM_RIGHT});
-        ctrl.panel.mapTypeSwitch = new BMap.MapTypeControl();     
+        ctrl.navigationSwitch = new BMap.NavigationControl();
+        ctrl.scaleSwitch = new BMap.ScaleControl();
+        ctrl.overviewMapSwitch = new BMap.OverviewMapControl({isOpen:true, anchor: BMAP_ANCHOR_BOTTOM_RIGHT});
+        ctrl.mapTypeSwitch = new BMap.MapTypeControl();     
         
-        if(ctrl.panel.navigation === true)ctrl.map.addControl(ctrl.panel.navigationSwitch);
-        if(ctrl.panel.scale === true)ctrl.map.addControl(ctrl.panel.scaleSwitch);
-        if(ctrl.panel.overviewMap === true)ctrl.map.addControl(ctrl.panel.overviewMapSwitch);
-        if(ctrl.panel.mapType === true)ctrl.map.addControl(ctrl.panel.mapTypeSwitch);
+        if(ctrl.panel.navigation === true)ctrl.map.addControl(ctrl.navigationSwitch);
+        if(ctrl.panel.scale === true)ctrl.map.addControl(ctrl.scaleSwitch);
+        if(ctrl.panel.overviewMap === true)ctrl.map.addControl(ctrl.overviewMapSwitch);
+        if(ctrl.panel.mapType === true)ctrl.map.addControl(ctrl.mapTypeSwitch);
+
+        ctrl.map.addEventListener("dragend", function() {
+          var center = ctrl.map.getCenter();
+          ctrl.panel.lat = center.lat;
+          ctrl.panel.lng = center.lng;
+        });
       });
     }
     //ctrl.map.resize();

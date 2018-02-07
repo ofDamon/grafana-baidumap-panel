@@ -5,14 +5,14 @@ import kbn from 'app/core/utils/kbn';
 
 import _ from 'lodash';
 import mapRenderer from './map_renderer';
-import DataFormatter from './data_formatter';
+import DataFormatter from "./data_formatter";
 
 const panelDefaults = {
   ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
   maxDataPoints: 1,
   theme: "normal",
-  mapCenterLatitude: 116.404,
-  mapCenterLongitude: 39.915,
+  lat: 39.915,
+  lng: 116.404,
   initialZoom: 11,
   valueName: "total",
   locationData: "countries",
@@ -36,7 +36,6 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     this.events.on('data-received', this.onDataReceived.bind(this));
     this.events.on('panel-teardown', this.onPanelTeardown.bind(this));
     this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
-
     //this.loadLocationDataFromFile();
   }
 
@@ -63,30 +62,15 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     }
 
     if (this.panel.locationData === "jsonp endpoint") {
-      if (!this.panel.jsonpUrl || !this.panel.jsonpCallback) return;
 
-      window.$.ajax({
-        type: "GET",
-        url: this.panel.jsonpUrl + "?callback=?",
-        contentType: "application/json",
-        jsonpCallback: this.panel.jsonpCallback,
-        dataType: "jsonp",
-        success: res => {
-          this.locations = res;
-          this.render();
-        }
-      });
     } else if (this.panel.locationData === "json endpoint") {
       if (!this.panel.jsonUrl) return;
 
-      window.$.getJSON(this.panel.jsonUrl).then(res => {
-        this.locations = res;
-        this.render();
-      });
     } else if (this.panel.locationData === "table") {
       // .. Do nothing
+
     } else if (this.panel.locationData !== "geohash" && this.panel.locationData !== "json result") {
-      window.$.getJSON("public/plugins/grafana-worldmap-panel/data/" + this.panel.locationData + ".json").then(this.reloadLocations.bind(this));
+
     }
   }
 
@@ -96,7 +80,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   }
 
   onPanelTeardown() {
-    if (this.map) this.map.remove();
+    if (this.map) delete this.map;
   }
 
   onInitEditMode() {
@@ -105,28 +89,26 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
 
   onDataReceived(dataList) {
     if (!dataList) return;
-
     if (this.dashboard.snapshot && this.locations) {
       this.panel.snapshotLocationData = this.locations;
     }
 
     const data = [];
-
-    if (this.panel.locationData === 'geohash') {
+    if (this.panel.locationData === "geohash") {
       this.dataFormatter.setGeohashValues(dataList, data);
-    } else if (this.panel.locationData === 'table') {
+    } else if (this.panel.locationData === "table") {
       const tableData = dataList.map(DataFormatter.tableHandler.bind(this));
       this.dataFormatter.setTableValues(tableData, data);
-    } else if (this.panel.locationData === 'json result') {
+    } else if (this.panel.locationData === "json result") {
       this.series = dataList;
       this.dataFormatter.setJsonValues(data);
     } else {
       this.series = dataList.map(this.seriesHandler.bind(this));
       this.dataFormatter.setValues(data);
+      
     }
     this.data = data;
-
-    if (this.data.length && this.panel.mapCenter === 'Last GeoHash') {
+    if (this.data.length) {
       this.centerOnLastGeoHash();
     } else {
       this.render();
@@ -134,8 +116,6 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   }
 
   centerOnLastGeoHash() {
-    mapCenters[this.panel.mapCenter].mapCenterLatitude = _.last(this.data).locationLatitude;
-    mapCenters[this.panel.mapCenter].mapCenterLongitude = _.last(this.data).locationLongitude;
     this.setNewMapCenter();
   }
 
@@ -154,11 +134,6 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   }
 
   setNewMapCenter() {
-    if (this.panel.mapCenter !== 'custom') {
-      this.panel.mapCenterLatitude = mapCenters[this.panel.mapCenter].mapCenterLatitude;
-      this.panel.mapCenterLongitude = mapCenters[this.panel.mapCenter].mapCenterLongitude;
-    }
-    this.mapCenterMoved = true;
     this.render();
   }
 
@@ -181,33 +156,33 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
 
   navigationControl() {
     if (this.panel.navigation == true) {
-      this.map.addControl(this.panel.navigationSwitch);
+      this.map.addControl(this.navigationSwitch);
     } else {
-      this.map.removeControl(this.panel.navigationSwitch);
+      this.map.removeControl(this.navigationSwitch);
     }
   }
 
   scaleControl() {
     if (this.panel.scale == true) {
-      this.map.addControl(this.panel.scaleSwitch);
+      this.map.addControl(this.scaleSwitch);
     } else {
-      this.map.removeControl(this.panel.scaleSwitch);
+      this.map.removeControl(this.scaleSwitch);
     }
   }
 
   overviewMapControl() {
     if (this.panel.overviewMap == true) {
-      this.map.addControl(this.panel.overviewMapSwitch);
+      this.map.addControl(this.overviewMapSwitch);
     } else {
-      this.map.removeControl(this.panel.overviewMapSwitch);
+      this.map.removeControl(this.overviewMapSwitch);
     }
   }
 
   mapTypeControl() {
     if (this.panel.mapType == true) {
-      this.map.addControl(this.panel.mapTypeSwitch);
+      this.map.addControl(this.mapTypeSwitch);
     } else {
-      this.map.removeControl(this.panel.mapTypeSwitch);
+      this.map.removeControl(this.mapTypeSwitch);
     }
   }
 
@@ -220,8 +195,6 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   }
 
   changeLocationData() {
-    this.loadLocationDataFromFile(true);
-
     if (this.panel.locationData === 'geohash') {
       this.render();
     }

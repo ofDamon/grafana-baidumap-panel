@@ -198,12 +198,11 @@ export default class WorldMap {
 	}
 
 	resize() {
-		console.log(111);
-		
+		this.map.invalidateSize();
 	}
 
 	panToMapCenter() {
-		this.map.panTo([ parseFloat(this.ctrl.panel.mapCenterLatitude), parseFloat(this.ctrl.panel.mapCenterLongitude) ]);
+		this.map.panTo([ parseFloat(this.ctrl.panel.lat), parseFloat(this.ctrl.panel.lng) ]);
 		this.ctrl.mapCenterMoved = false;
 	}
 
@@ -221,7 +220,6 @@ export default class WorldMap {
 	}
 
 	setZoom(zoomFactor) {
-		console.log(2323);
 		this.map.setZoom(parseInt(zoomFactor, 10));
 	}
 

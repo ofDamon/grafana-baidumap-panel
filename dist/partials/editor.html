@@ -13,8 +13,8 @@
 				'hardedge' ]" ng-change="ctrl.setStyle()"></select>
 			</div>
       <div class="gf-form" ng-show="ctrl.panel.mapCenter === 'custom'">
-        <input type="text" class="input-small gf-form-input width-10" ng-model="ctrl.panel.mapCenterLatitude" ng-change="ctrl.setNewMapCenter()" ng-model-onblur />
-        <input type="text" class="input-small gf-form-input width-10" ng-model="ctrl.panel.mapCenterLongitude" ng-change="ctrl.setNewMapCenter()" ng-model-onblur />
+        <input type="text" class="input-small gf-form-input width-10" ng-model="ctrl.panel.lat" ng-change="ctrl.setNewMapCenter()" ng-model-onblur />
+        <input type="text" class="input-small gf-form-input width-10" ng-model="ctrl.panel.lng" ng-change="ctrl.setNewMapCenter()" ng-model-onblur />
       </div>
 		</div>
 		<div class="gf-form">
