@@ -5,18 +5,18 @@ import kbn from 'app/core/utils/kbn';
 
 import _ from 'lodash';
 import mapRenderer from './map_renderer';
-import DataFormatter from "./data_formatter";
+import DataFormatter from './data_formatter';
 
 const panelDefaults = {
-  ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
+  ak: '4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ',
   maxDataPoints: 1,
-  theme: "normal",
+  theme: 'normal',
   lat: 39.915,
   lng: 116.404,
   initialZoom: 11,
-  valueName: "total",
-  locationData: "countries",
-  esMetric: "Count",
+  valueName: 'total',
+  locationData: 'countries',
+  esMetric: 'Count',
   decimals: 0,
   navigation: true,
   scale: true,
