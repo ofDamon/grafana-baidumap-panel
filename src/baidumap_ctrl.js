@@ -36,6 +36,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     this.events.on('data-received', this.onDataReceived.bind(this));
     this.events.on('panel-teardown', this.onPanelTeardown.bind(this));
     this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
+    console.log(this);
     //this.loadLocationDataFromFile();
   }
 
@@ -92,7 +93,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     if (this.dashboard.snapshot && this.locations) {
       this.panel.snapshotLocationData = this.locations;
     }
-
+    console.log(dataList);
     const data = [];
     if (this.panel.locationData === "geohash") {
       this.dataFormatter.setGeohashValues(dataList, data);

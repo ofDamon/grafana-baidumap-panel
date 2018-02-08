@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-System.register(['./baidumap_ctrl'], function (_export, _context) {
+System.register(["./baidumap_ctrl"], function (_export, _context) {
   "use strict";
 
   var BaidumapCtrl;
@@ -9,7 +9,16 @@ System.register(['./baidumap_ctrl'], function (_export, _context) {
       BaidumapCtrl = _baidumap_ctrl.default;
     }],
     execute: function () {
-      _export('PanelCtrl', BaidumapCtrl);
+
+      loadPluginCss({
+        dark: "plugins/grafana-baidumap-panel/css/baidumap.dark.css",
+        light: "plugins/grafana-baidumap-panel/css/baidumap.light.css"
+      });
+
+      /* eslint import/prefer-default-export: 0 */
+      /* eslint import/no-extraneous-dependencies: 0 */
+
+      _export("PanelCtrl", BaidumapCtrl);
     }
   };
 });

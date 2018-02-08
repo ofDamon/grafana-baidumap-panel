@@ -69,15 +69,15 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
       }();
 
       panelDefaults = {
-        ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
+        ak: '4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ',
         maxDataPoints: 1,
-        theme: "normal",
+        theme: 'normal',
         lat: 39.915,
         lng: 116.404,
         initialZoom: 11,
-        valueName: "total",
-        locationData: "countries",
-        esMetric: "Count",
+        valueName: 'total',
+        locationData: 'countries',
+        esMetric: 'Count',
         decimals: 0,
         navigation: true,
         scale: true,
@@ -101,6 +101,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           _this.events.on('data-received', _this.onDataReceived.bind(_this));
           _this.events.on('panel-teardown', _this.onPanelTeardown.bind(_this));
           _this.events.on('data-snapshot-load', _this.onDataSnapshotLoad.bind(_this));
+          console.log(_this);
           //this.loadLocationDataFromFile();
           return _this;
         }
@@ -161,7 +162,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             if (this.dashboard.snapshot && this.locations) {
               this.panel.snapshotLocationData = this.locations;
             }
-
+            console.log(dataList);
             var data = [];
             if (this.panel.locationData === "geohash") {
               this.dataFormatter.setGeohashValues(dataList, data);
