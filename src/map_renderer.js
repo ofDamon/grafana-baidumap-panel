@@ -16,9 +16,9 @@ export default function link(scope, elem, attrs, ctrl) {
     if (mapContainer[0].id.indexOf('{{') > -1) {
       return;
     }
-
     if (!ctrl.map) {
       MP(ctrl.panel.ak).then(BMap => {
+        console.log('start');
         const elementId = "mapid_" + ctrl.panel.id;
         ctrl.map = new BMap.Map(elementId);
         ctrl.map.centerAndZoom(new BMap.Point(ctrl.panel.lng, ctrl.panel.lat), parseInt(ctrl.panel.initialZoom, 10));
@@ -28,7 +28,7 @@ export default function link(scope, elem, attrs, ctrl) {
         ctrl.navigationSwitch = new BMap.NavigationControl();
         ctrl.scaleSwitch = new BMap.ScaleControl();
         ctrl.overviewMapSwitch = new BMap.OverviewMapControl({isOpen:true, anchor: BMAP_ANCHOR_BOTTOM_RIGHT});
-        ctrl.mapTypeSwitch = new BMap.MapTypeControl();     
+        ctrl.mapTypeSwitch = new BMap.MapTypeControl();   
         
         if(ctrl.panel.navigation === true)ctrl.map.addControl(ctrl.navigationSwitch);
         if(ctrl.panel.scale === true)ctrl.map.addControl(ctrl.scaleSwitch);
@@ -40,6 +40,23 @@ export default function link(scope, elem, attrs, ctrl) {
           ctrl.panel.lat = center.lat;
           ctrl.panel.lng = center.lng;
         });
+
+        function addMarker(point) {
+          const marker = new BMap.Marker(point);
+          marker.addEventListener("click", attribute);
+          ctrl.map.addOverlay(marker);
+        }
+
+        function attribute(e) {
+          const p = e.target;
+          alert("test location: " + p.getPosition().lng + "," + p.getPosition().lat);
+        }	
+
+        const list = ctrl.panel.mapCenters;
+        for (const i in list) {
+          const point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
+          addMarker(point);
+        }
       });
     }
     //ctrl.map.resize();

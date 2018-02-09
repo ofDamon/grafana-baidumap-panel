@@ -5,9 +5,11 @@ import kbn from 'app/core/utils/kbn';
 
 import _ from 'lodash';
 import mapRenderer from './map_renderer';
+import DataFormatter from './data_formatter';
 
 const panelDefaults = {
   ak: '4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ',
+  mapCenters: [],
   maxDataPoints: 1,
   theme: 'normal',
   lat: 39.915,
@@ -29,6 +31,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
 
     this.setMapProvider(contextSrv);
     _.defaults(this.panel, panelDefaults);
+    this.dataFormatter = new DataFormatter(this, kbn);
 
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('data-received', this.onDataReceived.bind(this));
@@ -90,9 +93,21 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     if (this.dashboard.snapshot && this.locations) {
       this.panel.snapshotLocationData = this.locations;
     }
-    console.log(dataList, this.panel.locationData);
+
     const data = [];
-    //this.series = dataList.map(this.seriesHandler.bind(this));
+    if (this.panel.locationData === "geohash") {
+      this.dataFormatter.setGeohashValues(dataList, data);
+    } else if (this.panel.locationData === "table") {
+      const tableData = dataList.map(DataFormatter.tableHandler.bind(this));
+      this.dataFormatter.setTableValues(tableData, data);
+    } else if (this.panel.locationData === "json result") {
+      this.series = dataList;
+      this.dataFormatter.setJsonValues(data);
+    } else {
+      this.series = dataList.map(this.seriesHandler.bind(this));
+      this.dataFormatter.setValues(data);
+    }
+
     this.data = data;
     if (this.data.length) {
       this.centerOnLastGeoHash();
@@ -102,7 +117,12 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   }
 
   centerOnLastGeoHash() {
-    this.setNewMapCenter();
+    const markerList = {};
+    markerList.mapCenterLatitude = _.last(this.data).locationLatitude;
+    markerList.mapCenterLongitude = _.last(this.data).locationLongitude;
+    this.panel.mapCenters.push(markerList);
+    this.render();
+    //this.setNewMapCenter();
   }
 
   onDataSnapshotLoad(snapshotData) {
@@ -114,11 +134,11 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       datapoints: seriesData.datapoints,
       alias: seriesData.target,
     });
-
+    
     series.flotpairs = series.getFlotPairs(this.panel.nullPointMode);
     return series;
   }
-
+  
   setNewMapCenter() {
     this.render();
   }

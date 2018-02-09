@@ -18,9 +18,9 @@ System.register(['./css/leaflet.css!', './libs/baidumap.js'], function (_export,
       if (mapContainer[0].id.indexOf('{{') > -1) {
         return;
       }
-
       if (!ctrl.map) {
         MP(ctrl.panel.ak).then(function (BMap) {
+          console.log('start');
           var elementId = "mapid_" + ctrl.panel.id;
           ctrl.map = new BMap.Map(elementId);
           ctrl.map.centerAndZoom(new BMap.Point(ctrl.panel.lng, ctrl.panel.lat), parseInt(ctrl.panel.initialZoom, 10));
@@ -42,6 +42,23 @@ System.register(['./css/leaflet.css!', './libs/baidumap.js'], function (_export,
             ctrl.panel.lat = center.lat;
             ctrl.panel.lng = center.lng;
           });
+
+          function addMarker(point) {
+            var marker = new BMap.Marker(point);
+            marker.addEventListener("click", attribute);
+            ctrl.map.addOverlay(marker);
+          }
+
+          function attribute(e) {
+            var p = e.target;
+            alert("test location: " + p.getPosition().lng + "," + p.getPosition().lat);
+          }
+
+          var list = ctrl.panel.mapCenters;
+          for (var i in list) {
+            var point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
+            addMarker(point);
+          }
         });
       }
       //ctrl.map.resize();
