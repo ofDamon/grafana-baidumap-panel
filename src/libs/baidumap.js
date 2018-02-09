@@ -7,7 +7,7 @@ export function MP(ak) {
     document.head.appendChild(script);
     setTimeout(() => {
         resolve(BMap);
-    }, 1000);
+    }, 500);
   });
   
 }
