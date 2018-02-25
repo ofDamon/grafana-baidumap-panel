@@ -9,16 +9,17 @@ import DataFormatter from './data_formatter';
 import { MP } from "./libs/baidumap.js";  
 
 const panelDefaults = {
-  ak: '4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ',
-  mapData: [],
+  ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
+  mapCenters: [],
+  markers: [],
   maxDataPoints: 1,
-  theme: 'normal',
+  theme: "normal",
   lat: 39.915,
   lng: 116.404,
   initialZoom: 11,
-  valueName: 'total',
-  locationData: 'countries',
-  esMetric: 'Count',
+  valueName: "total",
+  locationData: "countries",
+  esMetric: "Count",
   decimals: 0,
   navigation: true,
   scale: true,
@@ -117,13 +118,15 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   }
 
   centerOnLastGeoHash() {
+    this.panel.mapCenters.splice(0, this.panel.mapCenters.length);
+    this.panel.markers.splice(0, this.panel.markers.length);
     const markerList = {};
     markerList.mapCenterLatitude = _.last(this.data).locationLatitude;
     markerList.mapCenterLongitude = _.last(this.data).locationLongitude;
-    this.panel.mapData.push(markerList);
+    this.panel.mapCenters.push(markerList);
+
     if(this.map){
-      console.log(this.map);
-      this.addNode(this.BMap)
+      this.addNode(this.BMap);
     }else{
       this.render();
     }
@@ -133,7 +136,11 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   addMarker(point,BMap) {
     const myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
     const marker = new BMap.Marker(point, { icon: myIcon });
-    //marker.enableDragging();
+    this.panel.markers.push(marker);
+    const markerClusterer = new BMapLib.MarkerClusterer(this.map, {
+      markers: this.panel.markers
+    });
+    marker.enableDragging();
 
     let scontent = "";
     scontent += '<a href=""><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
@@ -150,17 +157,29 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
 
     this.map.addOverlay(marker);
     marker.addEventListener("dragend", function(e) {
-      alert("当前位置：" + e.point.lng + ", " + e.point.lat);
+      //alert("当前位置：" + e.point.lng + ", " + e.point.lat);
     });
   }
 
   addNode(BMap) {    
-    this.map.clearOverlays();
-    const list = this.panel.mapData;
-    for (const i in list) {
-      const point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
-      this.addMarker(point,BMap);
-    }
+    let textIconOverlay = document.createElement("script");
+    textIconOverlay.type = "text/javascript";
+    textIconOverlay.src = "http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js";
+    document.head.appendChild(textIconOverlay);
+
+    let markerClusterers = document.createElement("script");
+    markerClusterers.type = "text/javascript";
+    markerClusterers.src = "http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js";
+    document.head.appendChild(markerClusterers);
+
+    setTimeout(() => {
+      this.map.clearOverlays();
+      const list = this.panel.mapCenters;
+      for (const i in list) {
+        const point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
+        this.addMarker(point, BMap);
+      }
+    }, 500);
   }
 
   onDataSnapshotLoad(snapshotData) {

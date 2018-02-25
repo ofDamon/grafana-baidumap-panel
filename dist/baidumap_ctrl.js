@@ -71,16 +71,17 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
       }();
 
       panelDefaults = {
-        ak: '4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ',
-        mapData: [],
+        ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
+        mapCenters: [],
+        markers: [],
         maxDataPoints: 1,
-        theme: 'normal',
+        theme: "normal",
         lat: 39.915,
         lng: 116.404,
         initialZoom: 11,
-        valueName: 'total',
-        locationData: 'countries',
-        esMetric: 'Count',
+        valueName: "total",
+        locationData: "countries",
+        esMetric: "Count",
         decimals: 0,
         navigation: true,
         scale: true,
@@ -188,12 +189,14 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         }, {
           key: 'centerOnLastGeoHash',
           value: function centerOnLastGeoHash() {
+            this.panel.mapCenters.splice(0, this.panel.mapCenters.length);
+            this.panel.markers.splice(0, this.panel.markers.length);
             var markerList = {};
             markerList.mapCenterLatitude = _.last(this.data).locationLatitude;
             markerList.mapCenterLongitude = _.last(this.data).locationLongitude;
-            this.panel.mapData.push(markerList);
+            this.panel.mapCenters.push(markerList);
+
             if (this.map) {
-              console.log(this.map);
               this.addNode(this.BMap);
             } else {
               this.render();
@@ -205,7 +208,11 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           value: function addMarker(point, BMap) {
             var myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
             var marker = new BMap.Marker(point, { icon: myIcon });
-            //marker.enableDragging();
+            this.panel.markers.push(marker);
+            var markerClusterer = new BMapLib.MarkerClusterer(this.map, {
+              markers: this.panel.markers
+            });
+            marker.enableDragging();
 
             var scontent = "";
             scontent += '<a href=""><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
@@ -222,18 +229,32 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
 
             this.map.addOverlay(marker);
             marker.addEventListener("dragend", function (e) {
-              alert("当前位置：" + e.point.lng + ", " + e.point.lat);
+              //alert("当前位置：" + e.point.lng + ", " + e.point.lat);
             });
           }
         }, {
           key: 'addNode',
           value: function addNode(BMap) {
-            this.map.clearOverlays();
-            var list = this.panel.mapData;
-            for (var i in list) {
-              var point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
-              this.addMarker(point, BMap);
-            }
+            var _this2 = this;
+
+            var textIconOverlay = document.createElement("script");
+            textIconOverlay.type = "text/javascript";
+            textIconOverlay.src = "http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js";
+            document.head.appendChild(textIconOverlay);
+
+            var markerClusterers = document.createElement("script");
+            markerClusterers.type = "text/javascript";
+            markerClusterers.src = "http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js";
+            document.head.appendChild(markerClusterers);
+
+            setTimeout(function () {
+              _this2.map.clearOverlays();
+              var list = _this2.panel.mapCenters;
+              for (var i in list) {
+                var point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
+                _this2.addMarker(point, BMap);
+              }
+            }, 500);
           }
         }, {
           key: 'onDataSnapshotLoad',
