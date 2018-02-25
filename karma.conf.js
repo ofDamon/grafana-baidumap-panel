@@ -11,7 +11,7 @@ module.exports = (config) => {
     files: [
       'node_modules/es6-shim/es6-shim.js',
       'node_modules/lodash/lodash.js',
-      'src/worldmap.js',
+      'src/baidumap.js',
       'src/data_formatter.js',
       'src/geohash.js',
       'src/libs/leaflet.js',
@@ -47,7 +47,7 @@ module.exports = (config) => {
     systemjs: {
         // File patterns for application code, dependencies, and test suites
       files: [
-        'src/worldmap.js',
+        'src/baidumap.js',
         'src/data_formatter.js',
         'src/libs/leaflet.js',
         'test/**/*.js'

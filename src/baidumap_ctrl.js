@@ -6,10 +6,11 @@ import kbn from 'app/core/utils/kbn';
 import _ from 'lodash';
 import mapRenderer from './map_renderer';
 import DataFormatter from './data_formatter';
+import { MP } from "./libs/baidumap.js";  
 
 const panelDefaults = {
   ak: '4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ',
-  mapCenters: [],
+  mapData: [],
   maxDataPoints: 1,
   theme: 'normal',
   lat: 39.915,
@@ -32,7 +33,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     this.setMapProvider(contextSrv);
     _.defaults(this.panel, panelDefaults);
     this.dataFormatter = new DataFormatter(this, kbn);
-
+    
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('data-received', this.onDataReceived.bind(this));
     this.events.on('panel-teardown', this.onPanelTeardown.bind(this));
@@ -93,7 +94,6 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     if (this.dashboard.snapshot && this.locations) {
       this.panel.snapshotLocationData = this.locations;
     }
-
     const data = [];
     if (this.panel.locationData === "geohash") {
       this.dataFormatter.setGeohashValues(dataList, data);
@@ -120,9 +120,47 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     const markerList = {};
     markerList.mapCenterLatitude = _.last(this.data).locationLatitude;
     markerList.mapCenterLongitude = _.last(this.data).locationLongitude;
-    this.panel.mapCenters.push(markerList);
-    this.render();
+    this.panel.mapData.push(markerList);
+    if(this.map){
+      console.log(this.map);
+      this.addNode(this.BMap)
+    }else{
+      this.render();
+    }
     //this.setNewMapCenter();
+  }
+
+  addMarker(point,BMap) {
+    const myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
+    const marker = new BMap.Marker(point, { icon: myIcon });
+    //marker.enableDragging();
+
+    let scontent = "";
+    scontent += '<a href=""><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
+    scontent += '<div class="infobox-header"><div class="infobox-header-icon"><img src="public/plugins/grafana-baidumap-panel/images/pins6.png"></div>';
+    scontent += '<div class="infobox-header-name"><p>ffffff100000053c</p></div>';
+    scontent += '<div class="infobox-header-type" style="min-width:250px"><p>井盖</p></div></div>';
+    scontent += '<div class="infobox-footer">在线时间：10分钟前</div>';
+    scontent += '<div class="infobox-footer-right"></div></div><div class="arrow"></div></div></a>';
+
+    const infoWindow = new BMap.InfoWindow(scontent); // 创建信息窗口对象
+    marker.addEventListener("click", function() {
+      this.map.openInfoWindow(infoWindow, point); //开启信息窗口
+    });
+
+    this.map.addOverlay(marker);
+    marker.addEventListener("dragend", function(e) {
+      alert("当前位置：" + e.point.lng + ", " + e.point.lat);
+    });
+  }
+
+  addNode(BMap) {    
+    this.map.clearOverlays();
+    const list = this.panel.mapData;
+    for (const i in list) {
+      const point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
+      this.addMarker(point,BMap);
+    }
   }
 
   onDataSnapshotLoad(snapshotData) {

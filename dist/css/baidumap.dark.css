@@ -6,3 +6,20 @@
 .worldmap-popup .leaflet-popup-content-wrapper, .worldmap-popup .leaflet-popup-tip {
   background-color: #333;
 }
+
+.infobox-content{padding: 10px;}
+.infobox-body{max-height: 210px;width: 100% !important;}
+.infobox-body p{font-size: 24px;font-weight: lighter;line-height: 26px;margin: 0;max-width: 180px;overflow: hidden;padding-left: 15px;padding-right: 0;padding-top: 15px;text-align: right;text-overflow: ellipsis;}
+.infobox-footer{bottom: 5px;color: #aaa;font-weight: 100;left: 10px;line-height: 17px;margin: 0;position: absolute;}
+.infobox-footer-right{bottom: 5px;color: #aaa;font-weight: 100;right: 10px;line-height: 17px;margin: 0;position: absolute;}
+.infobox-header{font-size: 22px;text-align: left;overflow: hidden;}
+.infobox-header p{overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+.infobox-header-icon{float: left;padding-right: 15px;}
+.infobox-header-name{display: inline-flex;font-size: 18px;font-weight: 400;padding-top: 10px;}
+.infobox-header-type{font-size: 18px;font-weight: 100;margin-top: -5px;}
+.infobox-header h3{clear: both;font-size: 17px;font-weight: 100;letter-spacing: -0.025em;line-height: 1.08333em;margin: 0 15px 0 80px;min-height: 1.16667em;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+.infobox-header a{display: block;text-align: left;text-decoration: none;}
+.infobox h2{font-size: 12px;margin: 0;text-align: center;}
+.infobox .label-info{background-color: transparent;color: #aaa;font-size: 12px;font-weight: bold;line-height: 14px;margin-top: -10px;max-width: 120px;overflow: hidden;padding: 0 0 0 15px;text-align: right;text-overflow: ellipsis;text-shadow: none;vertical-align: baseline;white-space: nowrap;}
+.infobox-body-column{float: right;font-size: 24px;font-weight: lighter;line-height: 26px;margin: 0;max-width: 180px;overflow: hidden;padding-left: 15px;padding-right: 15px;padding-top: 15px;text-align: right;text-overflow: ellipsis;}
+.infobox{display: inline-block;background-clip: padding-box;background-color: #ffffff;border-radius: 6px;box-shadow: none;color: #000;margin: 0 auto;min-width: 180px;padding: 5px 5px 30px;position: relative;text-align: right;z-index: 1000;}

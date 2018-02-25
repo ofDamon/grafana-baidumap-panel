@@ -20,6 +20,7 @@ export default function link(scope, elem, attrs, ctrl) {
       MP(ctrl.panel.ak).then(BMap => {
         console.log('start');
         const elementId = "mapid_" + ctrl.panel.id;
+        ctrl.BMap = BMap;
         ctrl.map = new BMap.Map(elementId);
         ctrl.map.centerAndZoom(new BMap.Point(ctrl.panel.lng, ctrl.panel.lat), parseInt(ctrl.panel.initialZoom, 10));
         ctrl.map.enableScrollWheelZoom();
@@ -41,24 +42,10 @@ export default function link(scope, elem, attrs, ctrl) {
           ctrl.panel.lng = center.lng;
         });
 
-        function addMarker(point) {
-          const marker = new BMap.Marker(point);
-          marker.addEventListener("click", attribute);
-          ctrl.map.addOverlay(marker);
-        }
-
-        function attribute(e) {
-          const p = e.target;
-          alert("test location: " + p.getPosition().lng + "," + p.getPosition().lat);
-        }	
-
-        const list = ctrl.panel.mapCenters;
-        for (const i in list) {
-          const point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
-          addMarker(point);
-        }
+        ctrl.addNode(BMap);
       });
     }
+    
     //ctrl.map.resize();
 
     //if (ctrl.mapCenterMoved) ctrl.map.panToMapCenter();

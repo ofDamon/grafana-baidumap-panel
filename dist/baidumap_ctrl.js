@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn', 'lodash', './map_renderer', './data_formatter'], function (_export, _context) {
+System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn', 'lodash', './map_renderer', './data_formatter', './libs/baidumap.js'], function (_export, _context) {
   "use strict";
 
-  var MetricsPanelCtrl, TimeSeries, kbn, _, mapRenderer, DataFormatter, _createClass, panelDefaults, BaidumapCtrl;
+  var MetricsPanelCtrl, TimeSeries, kbn, _, mapRenderer, DataFormatter, MP, _createClass, panelDefaults, BaidumapCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -48,6 +48,8 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
       mapRenderer = _map_renderer.default;
     }, function (_data_formatter) {
       DataFormatter = _data_formatter.default;
+    }, function (_libsBaidumapJs) {
+      MP = _libsBaidumapJs.MP;
     }],
     execute: function () {
       _createClass = function () {
@@ -70,7 +72,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
 
       panelDefaults = {
         ak: '4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ',
-        mapCenters: [],
+        mapData: [],
         maxDataPoints: 1,
         theme: 'normal',
         lat: 39.915,
@@ -162,7 +164,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             if (this.dashboard.snapshot && this.locations) {
               this.panel.snapshotLocationData = this.locations;
             }
-
             var data = [];
             if (this.panel.locationData === "geohash") {
               this.dataFormatter.setGeohashValues(dataList, data);
@@ -190,9 +191,49 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             var markerList = {};
             markerList.mapCenterLatitude = _.last(this.data).locationLatitude;
             markerList.mapCenterLongitude = _.last(this.data).locationLongitude;
-            this.panel.mapCenters.push(markerList);
-            this.render();
+            this.panel.mapData.push(markerList);
+            if (this.map) {
+              console.log(this.map);
+              this.addNode(this.BMap);
+            } else {
+              this.render();
+            }
             //this.setNewMapCenter();
+          }
+        }, {
+          key: 'addMarker',
+          value: function addMarker(point, BMap) {
+            var myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
+            var marker = new BMap.Marker(point, { icon: myIcon });
+            //marker.enableDragging();
+
+            var scontent = "";
+            scontent += '<a href=""><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
+            scontent += '<div class="infobox-header"><div class="infobox-header-icon"><img src="public/plugins/grafana-baidumap-panel/images/pins6.png"></div>';
+            scontent += '<div class="infobox-header-name"><p>ffffff100000053c</p></div>';
+            scontent += '<div class="infobox-header-type" style="min-width:250px"><p>井盖</p></div></div>';
+            scontent += '<div class="infobox-footer">在线时间：10分钟前</div>';
+            scontent += '<div class="infobox-footer-right"></div></div><div class="arrow"></div></div></a>';
+
+            var infoWindow = new BMap.InfoWindow(scontent); // 创建信息窗口对象
+            marker.addEventListener("click", function () {
+              this.map.openInfoWindow(infoWindow, point); //开启信息窗口
+            });
+
+            this.map.addOverlay(marker);
+            marker.addEventListener("dragend", function (e) {
+              alert("当前位置：" + e.point.lng + ", " + e.point.lat);
+            });
+          }
+        }, {
+          key: 'addNode',
+          value: function addNode(BMap) {
+            this.map.clearOverlays();
+            var list = this.panel.mapData;
+            for (var i in list) {
+              var point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
+              this.addMarker(point, BMap);
+            }
           }
         }, {
           key: 'onDataSnapshotLoad',
