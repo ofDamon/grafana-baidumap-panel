@@ -237,16 +237,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           value: function addNode(BMap) {
             var _this2 = this;
 
-            var textIconOverlay = document.createElement("script");
-            textIconOverlay.type = "text/javascript";
-            textIconOverlay.src = "http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js";
-            document.head.appendChild(textIconOverlay);
-
-            var markerClusterers = document.createElement("script");
-            markerClusterers.type = "text/javascript";
-            markerClusterers.src = "http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js";
-            document.head.appendChild(markerClusterers);
-
             setTimeout(function () {
               _this2.map.clearOverlays();
               var list = _this2.panel.mapCenters;
