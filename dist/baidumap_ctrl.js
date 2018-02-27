@@ -85,7 +85,9 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         decimals: 0,
         navigation: true,
         scale: true,
+        hideEmpty: false,
         overviewMap: false,
+        hideZero: false,
         mapType: true
       };
 
@@ -180,6 +182,8 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             }
 
             this.data = data;
+            var valuess = this.filterEmptyAndZeroValues(this.data);
+            console.log(valuess);
             if (this.data.length) {
               this.centerOnLastGeoHash();
             } else {
@@ -229,7 +233,8 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
 
             this.map.addOverlay(marker);
             marker.addEventListener("dragend", function (e) {
-              //alert("当前位置：" + e.point.lng + ", " + e.point.lat);
+              point = new BMap.Point(e.point.lng, e.point.lat);
+              alert("当前位置：" + e.point.lng + ", " + e.point.lat);
             });
           }
         }, {
@@ -245,6 +250,15 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                 _this2.addMarker(point, BMap);
               }
             }, 500);
+          }
+        }, {
+          key: 'filterEmptyAndZeroValues',
+          value: function filterEmptyAndZeroValues(data) {
+            var _this3 = this;
+
+            return _.filter(data, function (o) {
+              return !(_this3.panel.hideEmpty && _.isNil(o.value)) && !(_this3.panel.hideZero && o.value === 0);
+            });
           }
         }, {
           key: 'onDataSnapshotLoad',

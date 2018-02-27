@@ -23,7 +23,9 @@ const panelDefaults = {
   decimals: 0,
   navigation: true,
   scale: true,
+  hideEmpty: false,
   overviewMap: false,
+  hideZero: false,
   mapType: true
 };
 
@@ -110,6 +112,8 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     }
 
     this.data = data;
+    const valuess = this.filterEmptyAndZeroValues(this.data);
+    console.log(valuess);
     if (this.data.length) {
       this.centerOnLastGeoHash();
     } else {
@@ -157,7 +161,8 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
 
     this.map.addOverlay(marker);
     marker.addEventListener("dragend", function(e) {
-      //alert("当前位置：" + e.point.lng + ", " + e.point.lat);
+      point = new BMap.Point(e.point.lng, e.point.lat);
+      alert("当前位置：" + e.point.lng + ", " + e.point.lat);
     });
   }
 
@@ -171,6 +176,12 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       }
     }, 500);
   }
+
+  filterEmptyAndZeroValues(data) {
+		return _.filter(data, (o) => {
+			return !(this.panel.hideEmpty && _.isNil(o.value)) && !(this.panel.hideZero && o.value === 0);
+		});
+	}
 
   onDataSnapshotLoad(snapshotData) {
     this.onDataReceived(snapshotData);
