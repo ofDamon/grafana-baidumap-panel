@@ -3,7 +3,7 @@
 System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn', 'lodash', './map_renderer', './data_formatter', './libs/baidumap.js'], function (_export, _context) {
   "use strict";
 
-  var MetricsPanelCtrl, TimeSeries, kbn, _, mapRenderer, DataFormatter, MP, _createClass, panelDefaults, BaidumapCtrl;
+  var MetricsPanelCtrl, TimeSeries, kbn, _, mapRenderer, DataFormatter, MP, _typeof, _createClass, panelDefaults, BaidumapCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -52,6 +52,12 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
       MP = _libsBaidumapJs.MP;
     }],
     execute: function () {
+      _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+        return typeof obj;
+      } : function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
+
       _createClass = function () {
         function defineProperties(target, props) {
           for (var i = 0; i < props.length; i++) {
@@ -72,15 +78,13 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
 
       panelDefaults = {
         ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
-        mapCenters: [],
-        markers: [],
         maxDataPoints: 1,
         theme: "normal",
         lat: 39.915,
         lng: 116.404,
         initialZoom: 11,
         valueName: "total",
-        locationData: "countries",
+        locationData: "table",
         esMetric: "Count",
         decimals: 0,
         navigation: true,
@@ -168,6 +172,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               this.panel.snapshotLocationData = this.locations;
             }
             var data = [];
+            console.log(this.panel.locationData);
             if (this.panel.locationData === "geohash") {
               this.dataFormatter.setGeohashValues(dataList, data);
             } else if (this.panel.locationData === "table") {
@@ -177,45 +182,38 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               this.series = dataList;
               this.dataFormatter.setJsonValues(data);
             } else {
-              this.series = dataList.map(this.seriesHandler.bind(this));
-              this.dataFormatter.setValues(data);
+              var _tableData = dataList.map(DataFormatter.tableHandler.bind(this));
+              this.dataFormatter.setTableValues(_tableData, data);
             }
 
-            this.data = data;
-            var valuess = this.filterEmptyAndZeroValues(this.data);
-            console.log(valuess);
-            if (this.data.length) {
-              this.centerOnLastGeoHash();
-            } else {
-              this.render();
-            }
-          }
-        }, {
-          key: 'centerOnLastGeoHash',
-          value: function centerOnLastGeoHash() {
-            this.panel.mapCenters.splice(0, this.panel.mapCenters.length);
-            this.panel.markers.splice(0, this.panel.markers.length);
-            var markerList = {};
-            markerList.mapCenterLatitude = _.last(this.data).locationLatitude;
-            markerList.mapCenterLongitude = _.last(this.data).locationLongitude;
-            this.panel.mapCenters.push(markerList);
+            var datas = this.filterEmptyAndZeroValues(data);
+            if (_typeof(this.data) === 'object') this.data.splice(0, this.data.length);
+            if (datas.length) {
+              console.log('有数据');
+              this.data = datas;
+              console.log(this.data);
 
-            if (this.map) {
-              this.addNode(this.BMap);
+              if (this.map) {
+                this.addNode(this.BMap);
+              } else {
+                this.render();
+              }
             } else {
+              console.log("无数据");
+              if (this.map) this.map.clearOverlays();
               this.render();
             }
-            //this.setNewMapCenter();
           }
         }, {
           key: 'addMarker',
-          value: function addMarker(point, BMap) {
+          value: function addMarker(point, BMap, pointArray) {
             var myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
             var marker = new BMap.Marker(point, { icon: myIcon });
-            this.panel.markers.push(marker);
-            var markerClusterer = new BMapLib.MarkerClusterer(this.map, {
+            /*
+            const markerClusterer = new BMapLib.MarkerClusterer(this.map, {
               markers: this.panel.markers
-            });
+            });*/
+            this.map.setViewport(pointArray);
             marker.enableDragging();
 
             var scontent = "";
@@ -243,11 +241,11 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             var _this2 = this;
 
             setTimeout(function () {
-              _this2.map.clearOverlays();
-              var list = _this2.panel.mapCenters;
+              var list = _this2.data;
+              var pointArray = [];
               for (var i in list) {
-                var point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
-                _this2.addMarker(point, BMap);
+                var point = pointArray[i] = new BMap.Point(list[i].locationLongitude, list[i].locationLatitude);
+                _this2.addMarker(point, BMap, pointArray);
               }
             }, 500);
           }

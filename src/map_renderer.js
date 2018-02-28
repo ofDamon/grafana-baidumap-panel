@@ -9,26 +9,17 @@ export default function link(scope, elem, attrs, ctrl) {
   });
 
   function render() {
-    if (!ctrl.data) return;
+    //if (!ctrl.data) return;
   
     const mapContainer = elem.find('.mapcontainer');
 
     if (mapContainer[0].id.indexOf('{{') > -1) {
       return;
     }
+    
     if (!ctrl.map) {
       MP(ctrl.panel.ak).then(BMap => {
         console.log('start');
-        let textIconOverlay = document.createElement("script");
-        textIconOverlay.type = "text/javascript";
-        textIconOverlay.src = "http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js";
-        document.head.appendChild(textIconOverlay);
-
-        let markerClusterers = document.createElement("script");
-        markerClusterers.type = "text/javascript";
-        markerClusterers.src = "http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js";
-        document.head.appendChild(markerClusterers);
-        
         const elementId = "mapid_" + ctrl.panel.id;
         ctrl.BMap = BMap;
         ctrl.map = new BMap.Map(elementId);
@@ -51,7 +42,7 @@ export default function link(scope, elem, attrs, ctrl) {
           ctrl.panel.lat = center.lat;
           ctrl.panel.lng = center.lng;
         });
-
+            
         ctrl.addNode(BMap);
       });
     }

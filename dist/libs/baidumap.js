@@ -12,6 +12,7 @@ System.register([], function (_export, _context) {
       document.head.appendChild(script);
 
       setTimeout(function () {
+
         resolve(BMap);
       }, 500);
     });

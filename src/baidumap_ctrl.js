@@ -10,15 +10,13 @@ import { MP } from "./libs/baidumap.js";
 
 const panelDefaults = {
   ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
-  mapCenters: [],
-  markers: [],
   maxDataPoints: 1,
   theme: "normal",
   lat: 39.915,
   lng: 116.404,
   initialZoom: 11,
   valueName: "total",
-  locationData: "countries",
+  locationData: "table",
   esMetric: "Count",
   decimals: 0,
   navigation: true,
@@ -98,6 +96,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       this.panel.snapshotLocationData = this.locations;
     }
     const data = [];
+    console.log(this.panel.locationData);
     if (this.panel.locationData === "geohash") {
       this.dataFormatter.setGeohashValues(dataList, data);
     } else if (this.panel.locationData === "table") {
@@ -107,43 +106,37 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       this.series = dataList;
       this.dataFormatter.setJsonValues(data);
     } else {
-      this.series = dataList.map(this.seriesHandler.bind(this));
-      this.dataFormatter.setValues(data);
+      const tableData = dataList.map(DataFormatter.tableHandler.bind(this));
+      this.dataFormatter.setTableValues(tableData, data);
     }
 
-    this.data = data;
-    const valuess = this.filterEmptyAndZeroValues(this.data);
-    console.log(valuess);
-    if (this.data.length) {
-      this.centerOnLastGeoHash();
+    const datas = this.filterEmptyAndZeroValues(data);
+    if(typeof this.data === 'object')this.data.splice(0, this.data.length);
+    if (datas.length) {
+      console.log('有数据');
+      this.data = datas;
+      console.log(this.data);
+      
+      if (this.map) {
+        this.addNode(this.BMap);
+      } else {
+        this.render();
+      }
     } else {
+      console.log("无数据");
+      if(this.map)this.map.clearOverlays();
       this.render();
     }
   }
 
-  centerOnLastGeoHash() {
-    this.panel.mapCenters.splice(0, this.panel.mapCenters.length);
-    this.panel.markers.splice(0, this.panel.markers.length);
-    const markerList = {};
-    markerList.mapCenterLatitude = _.last(this.data).locationLatitude;
-    markerList.mapCenterLongitude = _.last(this.data).locationLongitude;
-    this.panel.mapCenters.push(markerList);
-
-    if(this.map){
-      this.addNode(this.BMap);
-    }else{
-      this.render();
-    }
-    //this.setNewMapCenter();
-  }
-
-  addMarker(point,BMap) {
+  addMarker(point, BMap, pointArray) {
     const myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
     const marker = new BMap.Marker(point, { icon: myIcon });
-    this.panel.markers.push(marker);
+    /*
     const markerClusterer = new BMapLib.MarkerClusterer(this.map, {
       markers: this.panel.markers
-    });
+    });*/
+    this.map.setViewport(pointArray);
     marker.enableDragging();
 
     let scontent = "";
@@ -168,11 +161,11 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
 
   addNode(BMap) {    
     setTimeout(() => {
-      this.map.clearOverlays();
-      const list = this.panel.mapCenters;
+      const list = this.data;
+      const pointArray = [];
       for (const i in list) {
-        const point = new BMap.Point(list[i].mapCenterLongitude, list[i].mapCenterLatitude);
-        this.addMarker(point, BMap);
+        const point = pointArray[i] = new BMap.Point(list[i].locationLongitude, list[i].locationLatitude);
+        this.addMarker(point, BMap, pointArray);
       }
     }, 500);
   }

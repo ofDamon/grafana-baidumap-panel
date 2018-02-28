@@ -11,26 +11,17 @@ System.register(['./css/leaflet.css!', './libs/baidumap.js'], function (_export,
     });
 
     function render() {
-      if (!ctrl.data) return;
+      //if (!ctrl.data) return;
 
       var mapContainer = elem.find('.mapcontainer');
 
       if (mapContainer[0].id.indexOf('{{') > -1) {
         return;
       }
+
       if (!ctrl.map) {
         MP(ctrl.panel.ak).then(function (BMap) {
           console.log('start');
-          var textIconOverlay = document.createElement("script");
-          textIconOverlay.type = "text/javascript";
-          textIconOverlay.src = "http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js";
-          document.head.appendChild(textIconOverlay);
-
-          var markerClusterers = document.createElement("script");
-          markerClusterers.type = "text/javascript";
-          markerClusterers.src = "http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js";
-          document.head.appendChild(markerClusterers);
-
           var elementId = "mapid_" + ctrl.panel.id;
           ctrl.BMap = BMap;
           ctrl.map = new BMap.Map(elementId);
