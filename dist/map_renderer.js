@@ -11,7 +11,7 @@ System.register(['./css/leaflet.css!', './libs/baidumap.js'], function (_export,
     });
 
     function render() {
-      //if (!ctrl.data) return;
+      if (!ctrl.data && ctrl.map) return;
 
       var mapContainer = elem.find('.mapcontainer');
 

@@ -106,7 +106,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           _this.setMapProvider(contextSrv);
           _.defaults(_this.panel, panelDefaults);
           _this.dataFormatter = new DataFormatter(_this, kbn);
-
+          _this.markers = [];
           _this.events.on('init-edit-mode', _this.onInitEditMode.bind(_this));
           _this.events.on('data-received', _this.onDataReceived.bind(_this));
           _this.events.on('panel-teardown', _this.onPanelTeardown.bind(_this));
@@ -172,7 +172,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               this.panel.snapshotLocationData = this.locations;
             }
             var data = [];
-            console.log(this.panel.locationData);
             if (this.panel.locationData === "geohash") {
               this.dataFormatter.setGeohashValues(dataList, data);
             } else if (this.panel.locationData === "table") {
@@ -188,10 +187,9 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
 
             var datas = this.filterEmptyAndZeroValues(data);
             if (_typeof(this.data) === 'object') this.data.splice(0, this.data.length);
+            this.markers.splice(0, this.markers.length);
             if (datas.length) {
-              console.log('有数据');
               this.data = datas;
-              console.log(this.data);
 
               if (this.map) {
                 this.addNode(this.BMap);
@@ -199,7 +197,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                 this.render();
               }
             } else {
-              console.log("无数据");
               if (this.map) this.map.clearOverlays();
               this.render();
             }
@@ -210,9 +207,12 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             var myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
             var marker = new BMap.Marker(point, { icon: myIcon });
             /*
-            const markerClusterer = new BMapLib.MarkerClusterer(this.map, {
-              markers: this.panel.markers
-            });*/
+            this.markers.push(marker);
+            if(this.markers.length == this.data.length){
+              const markerClusterer = new BMapLib.MarkerClusterer(this.map, {
+                markers: this.markers
+              });
+            }*/
             this.map.setViewport(pointArray);
             marker.enableDragging();
 

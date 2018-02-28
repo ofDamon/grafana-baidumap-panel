@@ -34,7 +34,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     this.setMapProvider(contextSrv);
     _.defaults(this.panel, panelDefaults);
     this.dataFormatter = new DataFormatter(this, kbn);
-    
+    this.markers = [];
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('data-received', this.onDataReceived.bind(this));
     this.events.on('panel-teardown', this.onPanelTeardown.bind(this));
@@ -96,7 +96,6 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       this.panel.snapshotLocationData = this.locations;
     }
     const data = [];
-    console.log(this.panel.locationData);
     if (this.panel.locationData === "geohash") {
       this.dataFormatter.setGeohashValues(dataList, data);
     } else if (this.panel.locationData === "table") {
@@ -112,10 +111,9 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
 
     const datas = this.filterEmptyAndZeroValues(data);
     if(typeof this.data === 'object')this.data.splice(0, this.data.length);
+    this.markers.splice(0, this.markers.length);
     if (datas.length) {
-      console.log('有数据');
       this.data = datas;
-      console.log(this.data);
       
       if (this.map) {
         this.addNode(this.BMap);
@@ -123,7 +121,6 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
         this.render();
       }
     } else {
-      console.log("无数据");
       if(this.map)this.map.clearOverlays();
       this.render();
     }
@@ -133,9 +130,12 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     const myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
     const marker = new BMap.Marker(point, { icon: myIcon });
     /*
-    const markerClusterer = new BMapLib.MarkerClusterer(this.map, {
-      markers: this.panel.markers
-    });*/
+    this.markers.push(marker);
+    if(this.markers.length == this.data.length){
+      const markerClusterer = new BMapLib.MarkerClusterer(this.map, {
+        markers: this.markers
+      });
+    }*/
     this.map.setViewport(pointArray);
     marker.enableDragging();
 

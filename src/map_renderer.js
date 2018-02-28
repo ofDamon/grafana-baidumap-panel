@@ -9,7 +9,7 @@ export default function link(scope, elem, attrs, ctrl) {
   });
 
   function render() {
-    //if (!ctrl.data) return;
+    if (!ctrl.data && ctrl.map) return;
   
     const mapContainer = elem.find('.mapcontainer');
 
