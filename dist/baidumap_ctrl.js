@@ -83,7 +83,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         lat: 39.915,
         lng: 116.404,
         initialZoom: 11,
-        valueName: "total",
+        valueName: "current",
         locationData: "table",
         esMetric: "Count",
         decimals: 0,
@@ -186,6 +186,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             }
 
             var datas = this.filterEmptyAndZeroValues(data);
+            console.log(datas);
             if (_typeof(this.data) === 'object') this.data.splice(0, this.data.length);
             this.markers.splice(0, this.markers.length);
             if (datas.length) {
@@ -203,7 +204,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           }
         }, {
           key: 'addMarker',
-          value: function addMarker(point, BMap, pointArray) {
+          value: function addMarker(point, BMap, data) {
             var myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
             var marker = new BMap.Marker(point, { icon: myIcon });
             /*
@@ -213,14 +214,14 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                 markers: this.markers
               });
             }*/
-            this.map.setViewport(pointArray);
+            //this.map.setViewport(pointArray);
             marker.enableDragging();
-
+            var info = JSON.parse(data.locationName);
             var scontent = "";
-            scontent += '<a href=""><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
+            scontent += '<a href="' + info.url + '"><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
             scontent += '<div class="infobox-header"><div class="infobox-header-icon"><img src="public/plugins/grafana-baidumap-panel/images/pins6.png"></div>';
             scontent += '<div class="infobox-header-name"><p>ffffff100000053c</p></div>';
-            scontent += '<div class="infobox-header-type" style="min-width:250px"><p>井盖</p></div></div>';
+            scontent += '<div class="infobox-header-type" style="min-width:250px"><p>' + info.label + '</p></div></div>';
             scontent += '<div class="infobox-footer">在线时间：10分钟前</div>';
             scontent += '<div class="infobox-footer-right"></div></div><div class="arrow"></div></div></a>';
 
@@ -244,8 +245,8 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               var list = _this2.data;
               var pointArray = [];
               for (var i in list) {
-                var point = pointArray[i] = new BMap.Point(list[i].locationLongitude, list[i].locationLatitude);
-                _this2.addMarker(point, BMap, pointArray);
+                var point = new BMap.Point(list[i].locationLongitude, list[i].locationLatitude);
+                _this2.addMarker(point, BMap, list[i]);
               }
             }, 500);
           }

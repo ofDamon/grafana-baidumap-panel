@@ -149,7 +149,6 @@ export default class DataFormatter {
 
         const encodedGeohash = datapoint.geohash;
         const decodedGeohash = decodeGeoHash(encodedGeohash);
-
         const dataValue = {
           key: encodedGeohash,
           locationName: datapoint[this.ctrl.panel.tableLabel] || 'n/a',

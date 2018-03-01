@@ -174,7 +174,6 @@ System.register(['lodash', './geohash'], function (_export, _context) {
 
                 var encodedGeohash = datapoint.geohash;
                 var decodedGeohash = decodeGeoHash(encodedGeohash);
-
                 var dataValue = {
                   key: encodedGeohash,
                   locationName: datapoint[_this3.ctrl.panel.tableLabel] || 'n/a',
