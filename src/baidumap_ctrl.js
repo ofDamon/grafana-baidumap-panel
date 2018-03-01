@@ -162,7 +162,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
 
   addNode(BMap) {    
     var p1 = new BMap.Point(114.025125, 22.547656);
-    var p2 = new BMap.Point(114.05732, 22.516009);
+    var p2 = new BMap.Point(114.053295, 22.524289);
     var driving = new BMap.DrivingRoute(this.map, {
       renderOptions: { map: this.map, autoViewport: true }
     });

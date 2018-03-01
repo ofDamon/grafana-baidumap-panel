@@ -242,7 +242,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             var _this2 = this;
 
             var p1 = new BMap.Point(114.025125, 22.547656);
-            var p2 = new BMap.Point(114.05732, 22.516009);
+            var p2 = new BMap.Point(114.053439, 22.520416);
             var driving = new BMap.DrivingRoute(this.map, {
               renderOptions: { map: this.map, autoViewport: true }
             });
