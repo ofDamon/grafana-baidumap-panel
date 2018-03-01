@@ -126,7 +126,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       this.render();
     }
   }
-
+  
   addMarker(point, BMap, data) {
     const myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
     const marker = new BMap.Marker(point, { icon: myIcon });
@@ -161,6 +161,13 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   }
 
   addNode(BMap) {    
+    var p1 = new BMap.Point(114.025125, 22.547656);
+    var p2 = new BMap.Point(114.05732, 22.516009);
+    var driving = new BMap.DrivingRoute(this.map, {
+      renderOptions: { map: this.map, autoViewport: true }
+    });
+    driving.search(p1, p2);
+
     setTimeout(() => {
       const list = this.data;
       const pointArray = [];

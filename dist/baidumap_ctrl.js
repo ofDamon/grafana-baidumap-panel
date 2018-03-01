@@ -241,6 +241,13 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           value: function addNode(BMap) {
             var _this2 = this;
 
+            var p1 = new BMap.Point(114.025125, 22.547656);
+            var p2 = new BMap.Point(114.05732, 22.516009);
+            var driving = new BMap.DrivingRoute(this.map, {
+              renderOptions: { map: this.map, autoViewport: true }
+            });
+            driving.search(p1, p2);
+
             setTimeout(function () {
               var list = _this2.data;
               var pointArray = [];
