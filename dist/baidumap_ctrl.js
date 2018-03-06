@@ -242,13 +242,43 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             var _this2 = this;
 
             var p1 = new BMap.Point(114.025125, 22.547656);
-            var p2 = new BMap.Point(114.053439, 22.520416);
+            var p2 = new BMap.Point(114.053295, 22.524289);
             var driving = new BMap.DrivingRoute(this.map, {
               renderOptions: { map: this.map, autoViewport: true }
             });
             driving.search(p1, p2);
 
             setTimeout(function () {
+              var pointss = [{ lng: 114.074338, lat: 22.544852, count: 1150 }, { lng: 114.075338, lat: 22.545852, count: 2451 }, { lng: 114.076338, lat: 22.546852, count: 11150 }, { lng: 114.077338, lat: 22.547852, count: 450 }, { lng: 114.078338, lat: 22.548852, count: 1850 }, { lng: 114.079338, lat: 22.549852, count: 2450 }, { lng: 114.076438, lat: 22.544862, count: 1650 }, { lng: 114.076638, lat: 22.544872, count: 350 }, { lng: 114.080338, lat: 22.545852, count: 1150 }, { lng: 114.081338, lat: 22.546852, count: 2451 }, { lng: 114.082338, lat: 22.547852, count: 11150 }, { lng: 114.083338, lat: 22.548852, count: 450 }, { lng: 114.084338, lat: 22.549852, count: 1850 }, { lng: 114.085338, lat: 22.549852, count: 2450 }, { lng: 114.086438, lat: 22.544862, count: 1650 }, { lng: 114.087638, lat: 22.544872, count: 350 }];
+
+              if (!isSupportCanvas()) {
+                alert("热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~");
+              }
+              var heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
+              _this2.map.addOverlay(heatmapOverlay);
+              heatmapOverlay.setDataSet({ data: pointss, max: 100 });
+
+              function setGradient() {
+                /*格式如下所示:
+                {
+                0:'rgb(102, 255, 0)',
+                .5:'rgb(255, 170, 0)',
+                1:'rgb(255, 0, 0)'
+                }*/
+                var gradient = {};
+                var colors = document.querySelectorAll("input[type='color']");
+                colors = [].slice.call(colors, 0);
+                colors.forEach(function (ele) {
+                  gradient[ele.getAttribute("data-key")] = ele.value;
+                });
+                heatmapOverlay.setOptions({ gradient: gradient });
+              }
+              //判断浏览区是否支持canvas
+              function isSupportCanvas() {
+                var elem = document.createElement("canvas");
+                return !!(elem.getContext && elem.getContext("2d"));
+              }
+
               var list = _this2.data;
               var pointArray = [];
               for (var i in list) {

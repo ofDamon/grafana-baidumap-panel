@@ -22,6 +22,11 @@ System.register([], function (_export, _context) {
         markerClusterers.src = "http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js";
         document.head.appendChild(markerClusterers);
 
+        var heatmap = document.createElement("script");
+        heatmap.type = "text/javascript";
+        heatmap.src = "http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js";
+        document.head.appendChild(heatmap);
+
         resolve(BMap);
       }, 500);
     });
