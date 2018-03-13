@@ -74,5 +74,12 @@
 			<label class="gf-form-label width-12">Jsonp Callback</label>
 			<input type="text" class="input-small gf-form-input width-10" ng-model="ctrl.panel.jsonpCallback" ng-change="ctrl.refresh()" ng-model-onblur />
 		</div>
+		<div class="gf-form">
+			<label class="gf-form-label width-12">Icon Data</label>
+			<div class="gf-form-select-wrapper max-width-10">
+				<select class="input-small gf-form-input" ng-model="ctrl.panel.icon" ng-options="t for t in ['Label', 'Track', 'Heatmap']"
+				 ng-change="ctrl.onDataReceived()"></select>
+			</div>
+		</div>
 	</div>
 </div>

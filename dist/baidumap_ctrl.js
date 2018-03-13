@@ -85,6 +85,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         initialZoom: 11,
         valueName: "current",
         locationData: "table",
+        icon: "Label",
         esMetric: "Count",
         decimals: 0,
         navigation: true,
@@ -171,6 +172,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             if (this.dashboard.snapshot && this.locations) {
               this.panel.snapshotLocationData = this.locations;
             }
+            console.log(this.panel.locationData);
             var data = [];
             if (this.panel.locationData === "geohash") {
               this.dataFormatter.setGeohashValues(dataList, data);
@@ -184,9 +186,8 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               var _tableData = dataList.map(DataFormatter.tableHandler.bind(this));
               this.dataFormatter.setTableValues(_tableData, data);
             }
-
-            var datas = this.filterEmptyAndZeroValues(data);
-            console.log(datas);
+            //const datas = this.filterEmptyAndZeroValues(data);
+            var datas = data;
             if (_typeof(this.data) === 'object') this.data.splice(0, this.data.length);
             this.markers.splice(0, this.markers.length);
             if (datas.length) {
@@ -207,16 +208,17 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
           value: function addMarker(point, BMap, data) {
             var myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
             var marker = new BMap.Marker(point, { icon: myIcon });
-            /*
+
             this.markers.push(marker);
-            if(this.markers.length == this.data.length){
-              const markerClusterer = new BMapLib.MarkerClusterer(this.map, {
+            if (this.markers.length == this.data.length) {
+              var markerClusterer = new BMapLib.MarkerClusterer(this.map, {
                 markers: this.markers
               });
-            }*/
+            }
             //this.map.setViewport(pointArray);
             marker.enableDragging();
-            var info = JSON.parse(data.locationName);
+            console.log(data);
+            var info = '';
             var scontent = "";
             scontent += '<a href="' + info.url + '"><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
             scontent += '<div class="infobox-header"><div class="infobox-header-icon"><img src="public/plugins/grafana-baidumap-panel/images/pins6.png"></div>';
@@ -282,7 +284,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               var list = _this2.data;
               var pointArray = [];
               for (var i in list) {
-                var point = new BMap.Point(list[i].locationLongitude, list[i].locationLatitude);
+                var point = new BMap.Point(list[i].lng, list[i].lat);
                 _this2.addMarker(point, BMap, list[i]);
               }
             }, 500);

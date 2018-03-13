@@ -17,6 +17,7 @@ const panelDefaults = {
   initialZoom: 11,
   valueName: "current",
   locationData: "table",
+  icon: "Label",
   esMetric: "Count",
   decimals: 0,
   navigation: true,
@@ -95,6 +96,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     if (this.dashboard.snapshot && this.locations) {
       this.panel.snapshotLocationData = this.locations;
     }
+    console.log(this.panel.locationData);
     const data = [];
     if (this.panel.locationData === "geohash") {
       this.dataFormatter.setGeohashValues(dataList, data);
@@ -108,9 +110,8 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       const tableData = dataList.map(DataFormatter.tableHandler.bind(this));
       this.dataFormatter.setTableValues(tableData, data);
     }
-
-    const datas = this.filterEmptyAndZeroValues(data);
-    console.log(datas);
+    //const datas = this.filterEmptyAndZeroValues(data);
+    const datas = data;
     if(typeof this.data === 'object')this.data.splice(0, this.data.length);
     this.markers.splice(0, this.markers.length);
     if (datas.length) {
@@ -130,16 +131,17 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   addMarker(point, BMap, data) {
     const myIcon = new BMap.Icon("public/plugins/grafana-baidumap-panel/images/pins6-poi.png", new BMap.Size(30, 30));
     const marker = new BMap.Marker(point, { icon: myIcon });
-    /*
+    
     this.markers.push(marker);
     if(this.markers.length == this.data.length){
       const markerClusterer = new BMapLib.MarkerClusterer(this.map, {
         markers: this.markers
       });
-    }*/
+    }
     //this.map.setViewport(pointArray);
     marker.enableDragging();
-    const info = JSON.parse(data.locationName);
+    console.log(data);
+    const info = '';
     let scontent = "";
     scontent += '<a href="' + info.url + '"><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
     scontent += '<div class="infobox-header"><div class="infobox-header-icon"><img src="public/plugins/grafana-baidumap-panel/images/pins6.png"></div>';
@@ -219,7 +221,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       const list = this.data;
       const pointArray = [];
       for (const i in list) {
-        const point = new BMap.Point(list[i].locationLongitude, list[i].locationLatitude);
+        const point = new BMap.Point(list[i].lng, list[i].lat);
         this.addMarker(point, BMap, list[i]);
       }
     }, 500);

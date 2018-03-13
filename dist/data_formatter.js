@@ -161,39 +161,38 @@ System.register(['lodash', './geohash'], function (_export, _context) {
         }, {
           key: 'setTableValues',
           value: function setTableValues(tableData, data) {
-            var _this3 = this;
-
             if (tableData && tableData.length > 0) {
               var highestValue = 0;
               var lowestValue = Number.MAX_VALUE;
 
               tableData[0].forEach(function (datapoint) {
+                /*
                 if (!datapoint.geohash) {
                   return;
                 }
-
-                var encodedGeohash = datapoint.geohash;
-                var decodedGeohash = decodeGeoHash(encodedGeohash);
-                var dataValue = {
+                 const encodedGeohash = datapoint.geohash;
+                const decodedGeohash = decodeGeoHash(encodedGeohash);
+                const dataValue = {
                   key: encodedGeohash,
-                  locationName: datapoint[_this3.ctrl.panel.tableLabel] || 'n/a',
+                  locationName: datapoint[this.ctrl.panel.tableLabel] || 'n/a',
                   locationLatitude: decodedGeohash.latitude,
                   locationLongitude: decodedGeohash.longitude,
                   value: datapoint.metric,
                   valueFormatted: datapoint.metric,
                   valueRounded: 0
                 };
-
+                console.log(dataValue);
                 if (dataValue.value > highestValue) highestValue = dataValue.value;
                 if (dataValue.value < lowestValue) lowestValue = dataValue.value;
-
-                dataValue.valueRounded = _this3.kbn.roundValue(dataValue.value, _this3.ctrl.panel.decimals || 0);
+                 dataValue.valueRounded = this.kbn.roundValue(dataValue.value, this.ctrl.panel.decimals || 0);
                 data.push(dataValue);
+                */
+                data.push(datapoint);
               });
-
+              /*
               data.highestValue = highestValue;
               data.lowestValue = lowestValue;
-              data.valueRange = highestValue - lowestValue;
+              data.valueRange = highestValue - lowestValue;*/
             }
           }
         }, {

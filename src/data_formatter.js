@@ -143,6 +143,7 @@ export default class DataFormatter {
       let lowestValue = Number.MAX_VALUE;
 
       tableData[0].forEach((datapoint) => {
+        /*
         if (!datapoint.geohash) {
           return;
         }
@@ -158,17 +159,19 @@ export default class DataFormatter {
           valueFormatted: datapoint.metric,
           valueRounded: 0
         };
-
+        console.log(dataValue);
         if (dataValue.value > highestValue) highestValue = dataValue.value;
         if (dataValue.value < lowestValue) lowestValue = dataValue.value;
 
         dataValue.valueRounded = this.kbn.roundValue(dataValue.value, this.ctrl.panel.decimals || 0);
         data.push(dataValue);
+        */
+        data.push(datapoint);
       });
-
+      /*
       data.highestValue = highestValue;
       data.lowestValue = lowestValue;
-      data.valueRange = highestValue - lowestValue;
+      data.valueRange = highestValue - lowestValue;*/
     }
   }
 
