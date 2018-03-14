@@ -7,6 +7,7 @@ import _ from 'lodash';
 import mapRenderer from './map_renderer';
 import DataFormatter from './data_formatter';
 import { MP } from "./libs/baidumap.js";  
+import $ from 'jquery'
 
 const panelDefaults = {
   ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
@@ -31,7 +32,6 @@ const panelDefaults = {
 export default class BaidumapCtrl extends MetricsPanelCtrl {
   constructor($scope, $injector, contextSrv) {
     super($scope, $injector);
-
     this.setMapProvider(contextSrv);
     _.defaults(this.panel, panelDefaults);
     this.dataFormatter = new DataFormatter(this, kbn);
@@ -96,7 +96,6 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     if (this.dashboard.snapshot && this.locations) {
       this.panel.snapshotLocationData = this.locations;
     }
-    console.log(this.panel.locationData);
     const data = [];
     if (this.panel.locationData === "geohash") {
       this.dataFormatter.setGeohashValues(dataList, data);
@@ -140,13 +139,11 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     }
     //this.map.setViewport(pointArray);
     marker.enableDragging();
-    console.log(data);
-    const info = '';
     let scontent = "";
-    scontent += '<a href="' + info.url + '"><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
+    scontent += '<a href=""><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
     scontent += '<div class="infobox-header"><div class="infobox-header-icon"><img src="public/plugins/grafana-baidumap-panel/images/pins6.png"></div>';
-    scontent += '<div class="infobox-header-name"><p>ffffff100000053c</p></div>';
-    scontent += '<div class="infobox-header-type" style="min-width:250px"><p>' + info.label + '</p></div></div>';
+    scontent += '<div class="infobox-header-name"><p>'+data.nodeid+'</p></div>';
+    scontent += '<div class="infobox-header-type" style="min-width:250px"><p>'+data.type+'</p></div></div>';
     scontent += '<div class="infobox-footer">在线时间：10分钟前</div>';
     scontent += '<div class="infobox-footer-right"></div></div><div class="arrow"></div></div></a>';
 
@@ -163,68 +160,71 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   }
 
   addNode(BMap) {    
-    var p1 = new BMap.Point(114.025125, 22.547656);
-    var p2 = new BMap.Point(114.053295, 22.524289);
-    var driving = new BMap.DrivingRoute(this.map, {
-      renderOptions: { map: this.map, autoViewport: true }
-    });
-    driving.search(p1, p2); 
+    const list = this.data;
+    console.log(list);
+    if(list){
+      const fport = this.data[0].fport;
+      if(fport == "5"){
+        var lineArray = [];
+        var heatArray = [];
+        for (const i in list) {
+          if (list[i].lng > 0 && list[i].lat > 0) {
+              var url = "http://api.map.baidu.com/geoconv/v1/?coords="+list[i].lng+","+list[i].lat+"&from=1&to=5&ak=" + this.panel.ak + "&callback=?";
+              $.getJSON(url, function (e) {
+                var result = e.result[0];
+                const linePoint = new BMap.Point(result.x, result.y);
+                const heatPoint = { lng: result.x, lat: result.y, count: list[i].rssi};
+                lineArray.push(linePoint);
+                heatArray.push(heatPoint);
+              });
+          }
+        }
 
-    setTimeout(() => {
-      var pointss = [
-        { lng: 114.074338, lat: 22.544852, count: 1150 }, 
-        { lng: 114.075338, lat: 22.545852, count: 2451 },
-        { lng: 114.076338, lat: 22.546852, count: 11150 },
-        { lng: 114.077338, lat: 22.547852, count: 450 }, 
-        { lng: 114.078338, lat: 22.548852, count: 1850 }, 
-        { lng: 114.079338, lat: 22.549852, count: 2450 }, 
-        { lng: 114.076438, lat: 22.544862, count: 1650 }, 
-        { lng: 114.076638, lat: 22.544872, count: 350 },
-        { lng: 114.080338, lat: 22.545852, count: 1150 }, 
-        { lng: 114.081338, lat: 22.546852, count: 2451 },
-        { lng: 114.082338, lat: 22.547852, count: 11150 },
-        { lng: 114.083338, lat: 22.548852, count: 450 }, 
-        { lng: 114.084338, lat: 22.549852, count: 1850 }, 
-        { lng: 114.085338, lat: 22.549852, count: 2450 }, 
-        { lng: 114.086438, lat: 22.544862, count: 1650 }, 
-        { lng: 114.087638, lat: 22.544872, count: 350 }
-      ];
+        setTimeout(() => {
+          console.log(lineArray, heatArray);
+          var polyline = new BMap.Polyline(lineArray, {
+            enableEditing: false, //是否启用线编辑，默认为false
+            enableClicking: true, //是否响应点击事件，默认为true
+            strokeWeight: "8", //折线的宽度，以像素为单位
+            strokeOpacity: 0.8, //折线的透明度，取值范围0 - 1
+            strokeColor: "blue" //折线颜色
+          });
 
-      if (!isSupportCanvas()) {
-        alert("热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~");
-      }
-      var heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
-      this.map.addOverlay(heatmapOverlay);
-      heatmapOverlay.setDataSet({ data: pointss, max: 100 });
+          this.map.addOverlay(polyline); //增加折线
 
-      function setGradient() {
-        /*格式如下所示:
-		{
-	  		0:'rgb(102, 255, 0)',
-	 	 	.5:'rgb(255, 170, 0)',
-		  	1:'rgb(255, 0, 0)'
-		}*/
-        var gradient = {};
-        var colors = document.querySelectorAll("input[type='color']");
-        colors = [].slice.call(colors, 0);
-        colors.forEach(function(ele) {
-          gradient[ele.getAttribute("data-key")] = ele.value;
-        });
-        heatmapOverlay.setOptions({ gradient: gradient });
-      }
-      //判断浏览区是否支持canvas
-      function isSupportCanvas() {
-        var elem = document.createElement("canvas");
-        return !!(elem.getContext && elem.getContext("2d"));
-      }
+          //热力图
+          if (!isSupportCanvas()) {
+            alert("热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~");
+          }
+          var heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
+          this.map.addOverlay(heatmapOverlay);
+          heatmapOverlay.setDataSet({ data: heatArray, max: 100 });
 
-      const list = this.data;
-      const pointArray = [];
-      for (const i in list) {
-        const point = new BMap.Point(list[i].lng, list[i].lat);
-        this.addMarker(point, BMap, list[i]);
+          function setGradient() {
+            var gradient = {};
+            var colors = document.querySelectorAll("input[type='color']");
+            colors = [].slice.call(colors, 0);
+            colors.forEach(function(ele) {
+              gradient[ele.getAttribute("data-key")] = ele.value;
+            });
+            heatmapOverlay.setOptions({ gradient: gradient });
+          }
+          //判断浏览区是否支持canvas
+          function isSupportCanvas() {
+            var elem = document.createElement("canvas");
+            return !!(elem.getContext && elem.getContext("2d"));
+          }
+        }, 500);
+      }else{
+        setTimeout(() => {
+          const pointArray = [];
+          for (const i in list) {
+            const point = new BMap.Point(list[i].lng, list[i].lat);
+            this.addMarker(point, BMap, list[i]);
+          }
+        }, 500);
       }
-    }, 500);
+    }
   }
 
   filterEmptyAndZeroValues(data) {
