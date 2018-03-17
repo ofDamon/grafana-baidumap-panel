@@ -243,17 +243,17 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             var _this2 = this;
 
             var list = this.data;
+            this.map.clearOverlays();
             console.log(list);
             if (list) {
-              var fport = this.data[0].fport;
-              if (fport == "5") {
+              (function () {
+                var fport = _this2.data[0].fport;
                 var lineArray = [];
                 var heatArray = [];
 
                 var _loop = function _loop(i) {
                   if (list[i].lng > 0 && list[i].lat > 0) {
-                    url = "http://api.map.baidu.com/geoconv/v1/?coords=" + list[i].lng + "," + list[i].lat + "&from=1&to=5&ak=" + _this2.panel.ak + "&callback=?";
-
+                    var url = "http://api.map.baidu.com/geoconv/v1/?coords=" + list[i].lng + "," + list[i].lat + "&from=1&to=5&ak=" + _this2.panel.ak + "&callback=?";
                     $.getJSON(url, function (e) {
                       var result = e.result[0];
                       var linePoint = new BMap.Point(result.x, result.y);
@@ -265,55 +265,51 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                 };
 
                 for (var i in list) {
-                  var url;
-
                   _loop(i);
                 }
 
                 setTimeout(function () {
-                  console.log(lineArray, heatArray);
-                  var polyline = new BMap.Polyline(lineArray, {
-                    enableEditing: false, //是否启用线编辑，默认为false
-                    enableClicking: true, //是否响应点击事件，默认为true
-                    strokeWeight: "8", //折线的宽度，以像素为单位
-                    strokeOpacity: 0.8, //折线的透明度，取值范围0 - 1
-                    strokeColor: "blue" //折线颜色
-                  });
+                  if (fport == "5") {
+                    var setGradient = function setGradient() {
+                      var gradient = {};
+                      var colors = document.querySelectorAll("input[type='color']");
+                      colors = [].slice.call(colors, 0);
+                      colors.forEach(function (ele) {
+                        gradient[ele.getAttribute("data-key")] = ele.value;
+                      });
+                      heatmapOverlay.setOptions({ gradient: gradient });
+                    };
 
-                  _this2.map.addOverlay(polyline); //增加折线
+                    var isSupportCanvas = function isSupportCanvas() {
+                      var elem = document.createElement("canvas");
+                      return !!(elem.getContext && elem.getContext("2d"));
+                    };
 
-                  //热力图
-                  if (!isSupportCanvas()) {
-                    alert("热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~");
-                  }
-                  var heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
-                  _this2.map.addOverlay(heatmapOverlay);
-                  heatmapOverlay.setDataSet({ data: heatArray, max: 100 });
-
-                  function setGradient() {
-                    var gradient = {};
-                    var colors = document.querySelectorAll("input[type='color']");
-                    colors = [].slice.call(colors, 0);
-                    colors.forEach(function (ele) {
-                      gradient[ele.getAttribute("data-key")] = ele.value;
+                    //热力图
+                    if (!isSupportCanvas()) {
+                      alert("热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~");
+                    }
+                    var heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
+                    _this2.map.addOverlay(heatmapOverlay);
+                    heatmapOverlay.setDataSet({ data: heatArray, max: 100 });
+                  } else if (fport == "33") {
+                    var polyline = new BMap.Polyline(lineArray, {
+                      enableEditing: false, //是否启用线编辑，默认为false
+                      enableClicking: true, //是否响应点击事件，默认为true
+                      strokeWeight: "4", //折线的宽度，以像素为单位
+                      strokeOpacity: 0.5, //折线的透明度，取值范围0 - 1
+                      strokeColor: "blue" //折线颜色
                     });
-                    heatmapOverlay.setOptions({ gradient: gradient });
-                  }
-                  //判断浏览区是否支持canvas
-                  function isSupportCanvas() {
-                    var elem = document.createElement("canvas");
-                    return !!(elem.getContext && elem.getContext("2d"));
-                  }
-                }, 500);
-              } else {
-                setTimeout(function () {
-                  var pointArray = [];
-                  for (var i in list) {
-                    var point = new BMap.Point(list[i].lng, list[i].lat);
-                    _this2.addMarker(point, BMap, list[i]);
+                    _this2.map.addOverlay(polyline); //增加折线
+                  } else {
+                    var pointArray = [];
+                    for (var i in list) {
+                      var point = new BMap.Point(list[i].lng, list[i].lat);
+                      _this2.addMarker(point, BMap, list[i]);
+                    }
                   }
                 }, 500);
-              }
+              })();
             }
           }
         }, {
