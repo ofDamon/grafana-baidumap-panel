@@ -79,7 +79,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
       }();
 
       panelDefaults = {
-        ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
+        ak: "QKCqsdHBbGxBnNbvUwWdUEBjonk7jUj6",
         maxDataPoints: 1,
         theme: "normal",
         lat: 39.915,
@@ -108,6 +108,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
 
           _this.setMapProvider(contextSrv);
           _.defaults(_this.panel, panelDefaults);
+
           _this.dataFormatter = new DataFormatter(_this, kbn);
           _this.markers = [];
           _this.events.on('init-edit-mode', _this.onInitEditMode.bind(_this));
@@ -255,11 +256,13 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                   if (list[i].lng > 0 && list[i].lat > 0) {
                     var url = "http://api.map.baidu.com/geoconv/v1/?coords=" + list[i].lng + "," + list[i].lat + "&from=1&to=5&ak=" + _this2.panel.ak + "&callback=?";
                     $.getJSON(url, function (e) {
-                      var result = e.result[0];
-                      var linePoint = new BMap.Point(result.x, result.y);
-                      var heatPoint = { lng: result.x, lat: result.y, count: list[i].rssi };
-                      lineArray.push(linePoint);
-                      heatArray.push(heatPoint);
+                      if (e.status == 0) {
+                        var result = e.result[0];
+                        var linePoint = new BMap.Point(result.x, result.y);
+                        var heatPoint = { lng: result.x, lat: result.y, count: list[i].rssi };
+                        lineArray.push(linePoint);
+                        heatArray.push(heatPoint);
+                      }
                     });
                   }
                 };
@@ -308,7 +311,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                       _this2.addMarker(point, BMap, list[i]);
                     }
                   }
-                }, 500);
+                }, 1000);
               })();
             }
           }

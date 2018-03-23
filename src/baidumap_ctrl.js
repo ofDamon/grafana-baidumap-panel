@@ -10,7 +10,7 @@ import { MP } from "./libs/baidumap.js";
 import $ from 'jquery'
 
 const panelDefaults = {
-  ak: "4AWvSkHwSEcX8nwS0bZBcFZTDw70NzZZ",
+  ak: "QKCqsdHBbGxBnNbvUwWdUEBjonk7jUj6",
   maxDataPoints: 1,
   theme: "normal",
   lat: 39.915,
@@ -28,12 +28,12 @@ const panelDefaults = {
   hideZero: false,
   mapType: true
 };
-
 export default class BaidumapCtrl extends MetricsPanelCtrl {
   constructor($scope, $injector, contextSrv) {
     super($scope, $injector);
     this.setMapProvider(contextSrv);
     _.defaults(this.panel, panelDefaults);
+
     this.dataFormatter = new DataFormatter(this, kbn);
     this.markers = [];
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
@@ -172,11 +172,13 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
         if (list[i].lng > 0 && list[i].lat > 0) {
           const url = "http://api.map.baidu.com/geoconv/v1/?coords=" + list[i].lng + "," + list[i].lat + "&from=1&to=5&ak=" + this.panel.ak + "&callback=?";
           $.getJSON(url, function (e) {
-            const result = e.result[0];
-            const linePoint = new BMap.Point(result.x, result.y);
-            const heatPoint = { lng: result.x, lat: result.y, count: list[i].rssi };
-            lineArray.push(linePoint);
-            heatArray.push(heatPoint);
+            if(e.status == 0){
+              const result = e.result[0];
+              const linePoint = new BMap.Point(result.x, result.y);
+              const heatPoint = { lng: result.x, lat: result.y, count: list[i].rssi };
+              lineArray.push(linePoint);
+              heatArray.push(heatPoint);
+            }
           });
         }
       }
@@ -221,7 +223,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
               this.addMarker(point, BMap, list[i]);
             }
         }
-      }, 500);
+      }, 1000);
     }
   }
 
