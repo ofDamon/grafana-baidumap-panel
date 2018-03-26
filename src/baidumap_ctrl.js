@@ -116,11 +116,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     if (datas.length) {
       this.data = datas;
       
-      if (this.map) {
-        this.addNode(this.BMap);
-      } else {
-        this.render();
-      }
+      this.map ? this.addNode(this.BMap) : this.render();
     } else {
       if(this.map)this.map.clearOverlays();
       this.render();
@@ -160,6 +156,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
   }
 
   addNode(BMap) {    
+    var that = this;
     const list = this.data;
     this.map.clearOverlays();
     console.log(list);
@@ -167,63 +164,93 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       const fport = this.data[0].fport;
       const lineArray = [];
       const heatArray = [];
-      
-      for (const i in list) {
-        if (list[i].lng > 0 && list[i].lat > 0) {
-          const url = "http://api.map.baidu.com/geoconv/v1/?coords=" + list[i].lng + "," + list[i].lat + "&from=1&to=5&ak=" + this.panel.ak + "&callback=?";
-          $.getJSON(url, function (e) {
-            if(e.status == 0){
-              const result = e.result[0];
-              const linePoint = new BMap.Point(result.x, result.y);
-              const heatPoint = { lng: result.x, lat: result.y, count: list[i].rssi };
-              lineArray.push(linePoint);
-              heatArray.push(heatPoint);
+      const convertor = new BMap.Convertor();
+
+      var rawLength = 0;
+      var translatedElements = [];
+
+      if(fport != "5" && fport != "33"){
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].lng > 0 && list[i].lat > 0) {
+            const point = new BMap.Point(list[i].lng, list[i].lat);
+            that.addMarker(point, BMap, list[i]);
+          }
+        }
+      }else{
+        for (var i = 0; i < list.length; i++) {
+          setTimeout(function (index) {
+            return function () {
+              if (list[index].lng > 0 && list[index].lat > 0) {
+                rawLength++;
+                translateOne(index, list[index]);
+              }
             }
-          });
+          }(i), i * 10);
         }
       }
-      
-      setTimeout(() => {
-        if(fport == "5"){
-          //热力图
-          if (!isSupportCanvas()) {
-            alert("热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~");
-          }
-          var heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
-          this.map.addOverlay(heatmapOverlay);
-          heatmapOverlay.setDataSet({ data: heatArray, max: 100 });
 
-          function setGradient() {
-            var gradient = {};
-            var colors = document.querySelectorAll("input[type='color']");
-            colors = [].slice.call(colors, 0);
-            colors.forEach(function (ele) {
-              gradient[ele.getAttribute("data-key")] = ele.value;
+      function translateOne(index, gps) {
+        function translateCallback(returnedData) {
+          if (returnedData.status == 0) {
+            translatedElements.push({
+              index: index,
+              point: returnedData.points[0],
+              rssi: gps.rssi
             });
-            heatmapOverlay.setOptions({ gradient: gradient });
-          }
-          //判断浏览区是否支持canvas
-          function isSupportCanvas() {
-            var elem = document.createElement("canvas");
-            return !!(elem.getContext && elem.getContext("2d"));
-          }
-        }else if(fport == "33"){
-          var polyline = new BMap.Polyline(lineArray, {
-            enableEditing: false, //是否启用线编辑，默认为false
-            enableClicking: true, //是否响应点击事件，默认为true
-            strokeWeight: "4", //折线的宽度，以像素为单位
-            strokeOpacity: 0.5, //折线的透明度，取值范围0 - 1
-            strokeColor: "blue" //折线颜色
-          });
-          this.map.addOverlay(polyline); //增加折线
-        }else{
-            const pointArray = [];
-            for (const i in list) {
-              const point = new BMap.Point(list[i].lng, list[i].lat);
-              this.addMarker(point, BMap, list[i]);
+
+            if (translatedElements.length == rawLength) {
+              translatedElements.sort(function (a, b) {
+                return a.index - b.index;
+              });
+              for (var i = 0; i < translatedElements.length; i++) {
+                lineArray.push(translatedElements[i].point);
+                var heatPoint = { lng: translatedElements[i].point.lng, lat: translatedElements[i].point.lat, count: translatedElements[i].rssi };
+                heatArray.push(heatPoint);
+              }
+
+              if (fport == "5") {
+                //热力图
+                if (!isSupportCanvas()) {
+                  alert("热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~");
+                }
+                var heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
+                that.map.addOverlay(heatmapOverlay);
+                heatmapOverlay.setDataSet({ data: heatArray, max: 100 });
+
+                function setGradient() {
+                  var gradient = {};
+                  var colors = document.querySelectorAll("input[type='color']");
+                  colors = [].slice.call(colors, 0);
+                  colors.forEach(function (ele) {
+                    gradient[ele.getAttribute("data-key")] = ele.value;
+                  });
+                  heatmapOverlay.setOptions({ gradient: gradient });
+                }
+                //判断浏览区是否支持canvas
+                function isSupportCanvas() {
+                  var elem = document.createElement("canvas");
+                  return !!(elem.getContext && elem.getContext("2d"));
+                }
+              } else if (fport == "33") {
+                var polyline = new BMap.Polyline(lineArray, {
+                  enableEditing: false, 
+                  enableClicking: true, 
+                  strokeWeight: "4", 
+                  strokeOpacity: 0.5, 
+                  strokeColor: "blue"
+                });
+                that.map.addOverlay(polyline);
+              }
             }
+          } else {
+            console.log("转换出错: " + returnedData.status);
+          }
         }
-      }, 1000);
+        // 转换坐标
+        var point = new BMap.Point(gps.lng, gps.lat);
+        convertor.translate(new Array(point), 1, 5, translateCallback);
+      }
+
     }
   }
 
