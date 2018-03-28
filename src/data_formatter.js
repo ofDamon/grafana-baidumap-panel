@@ -141,7 +141,6 @@ export default class DataFormatter {
     if (tableData && tableData.length > 0) {
       let highestValue = 0;
       let lowestValue = Number.MAX_VALUE;
-
       tableData[0].forEach((datapoint) => {
         /*
         if (!datapoint.geohash) {

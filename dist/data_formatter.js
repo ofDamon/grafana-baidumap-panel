@@ -164,7 +164,6 @@ System.register(['lodash', './geohash'], function (_export, _context) {
             if (tableData && tableData.length > 0) {
               var highestValue = 0;
               var lowestValue = Number.MAX_VALUE;
-
               tableData[0].forEach(function (datapoint) {
                 /*
                 if (!datapoint.geohash) {

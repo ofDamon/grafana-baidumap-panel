@@ -189,6 +189,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               this.dataFormatter.setTableValues(_tableData, data);
             }
             //const datas = this.filterEmptyAndZeroValues(data);
+
             var datas = data;
             if (_typeof(this.data) === 'object') this.data.splice(0, this.data.length);
             this.markers.splice(0, this.markers.length);
@@ -285,6 +286,12 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                             return !!(elem.getContext && elem.getContext("2d"));
                           };
 
+                          var ZoomControl = function ZoomControl() {
+                            // 默认停靠位置和偏移量
+                            this.defaultAnchor = BMAP_ANCHOR_BOTTOM_RIGHT;
+                            this.defaultOffset = new BMap.Size(10, 10);
+                          };
+
                           //热力图
                           if (!isSupportCanvas()) {
                             alert("热力图目前只支持有canvas支持的浏览器,您所使用的浏览器不能使用热力图功能~");
@@ -292,6 +299,19 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                           var heatmapOverlay = new BMapLib.HeatmapOverlay({ radius: 20 });
                           that.map.addOverlay(heatmapOverlay);
                           heatmapOverlay.setDataSet({ data: heatArray, max: 100 });
+
+                          ZoomControl.prototype = new BMap.Control();
+                          ZoomControl.prototype.initialize = function (map) {
+                            var div = document.createElement("div");
+                            var content = '<div id="heatmap_mark"><div><span class="heatmap_mark_title">颜色对应RSSI信号强度</span> <span class="heatmap_mark_text" style="float:right;padding-top:5px" id="heatmap_mark_density">dBm</span></div><div class="linear_color"></div><span class="heatmap_blue heatmap_mark_text heatmap_color_span">-60以下</span><span class="heatmap_green heatmap_mark_text heatmap_color_span">-60至-80</span><span class="heatmap_yellow heatmap_mark_text heatmap_color_span">-80至-100</span><span class="heatmap_red heatmap_mark_text heatmap_color_span">-100至-120</span><span class="heatmap_result_red heatmap_mark_text heatmap_color_span">-120以上</span></div>';
+                            div.innerHTML = content;
+
+                            that.map.getContainer().appendChild(div);
+                            return div;
+                          };
+
+                          var myZoomCtrl = new ZoomControl();
+                          that.map.addControl(myZoomCtrl);
                         } else if (fport == "33") {
                           var polyline = new BMap.Polyline(lineArray, {
                             enableEditing: false,
@@ -319,7 +339,6 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
 
                 rawLength = 0;
                 translatedElements = [];
-
 
                 if (fport != "5" && fport != "33") {
                   for (i = 0; i < list.length; i++) {

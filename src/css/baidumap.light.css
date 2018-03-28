@@ -17,3 +17,36 @@
 .infobox .label-info{background-color: transparent;color: #aaa;font-size: 12px;font-weight: bold;line-height: 14px;margin-top: -10px;max-width: 120px;overflow: hidden;padding: 0 0 0 15px;text-align: right;text-overflow: ellipsis;text-shadow: none;vertical-align: baseline;white-space: nowrap;}
 .infobox-body-column{float: right;font-size: 24px;font-weight: lighter;line-height: 26px;margin: 0;max-width: 180px;overflow: hidden;padding-left: 15px;padding-right: 15px;padding-top: 15px;text-align: right;text-overflow: ellipsis;}
 .infobox{display: inline-block;background-clip: padding-box;background-color: #ffffff;border-radius: 6px;box-shadow: none;color: #000;margin: 0 auto;min-width: 180px;padding: 5px 5px 30px;position: relative;text-align: right;z-index: 1000;}
+#heatmap_mark {
+    bottom: 0;
+    background-color: rgba(73,73,72,.6);
+    border-radius: 10px;
+    padding: 1em;
+}
+.heatmap_mark_title {
+    color: #fff;
+    font-size: 16px;
+}
+.heatmap_mark_text {
+    color: #dfdfdf;
+}
+.linear_color {
+    margin-top: 10px;
+    height: 5px;
+    border-radius: 2px;
+    width: 400px;
+    background: -webkit-linear-gradient(left,rgba(0,0,0,.1),#00f,#0f0,#ff0,red,red)!important;
+    background: -moz-linear-gradient(left,rgba(0,0,0,.1),#00f,#0f0,#ff0,red,red)!important;
+    background: -ms-linear-gradient(left,rgba(0,0,0,.1),#00f,#0f0,#ff0,red,red)!important;
+    background: -o-linear-gradient(left,rgba(0,0,0,.1),#00f,#0f0,#ff0,red,red)!important;
+    background: linear-gradient(left,rgba(0,0,0,.1),#00f,#0f0,#ff0,red,red)!important;
+}
+.heatmap_color_span {
+    width: 20%;
+}
+.heatmap_color_span, .inline-block, .long_line {
+    display: inline-block;
+}
+.heatmap_blue, .heatmap_green, .heatmap_red, .heatmap_result_red, .heatmap_yellow, .text_center {
+    text-align: center;
+}

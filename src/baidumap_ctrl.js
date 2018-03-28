@@ -110,6 +110,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       this.dataFormatter.setTableValues(tableData, data);
     }
     //const datas = this.filterEmptyAndZeroValues(data);
+    
     const datas = data;
     if(typeof this.data === 'object')this.data.splice(0, this.data.length);
     this.markers.splice(0, this.markers.length);
@@ -168,7 +169,6 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
 
       var rawLength = 0;
       var translatedElements = [];
-
       if(fport != "5" && fport != "33"){
         for (var i = 0; i < list.length; i++) {
           if (list[i].lng > 0 && list[i].lat > 0) {
@@ -231,6 +231,26 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
                   var elem = document.createElement("canvas");
                   return !!(elem.getContext && elem.getContext("2d"));
                 }
+
+                function ZoomControl() {
+                  // 默认停靠位置和偏移量
+                  this.defaultAnchor = BMAP_ANCHOR_BOTTOM_RIGHT;
+                  this.defaultOffset = new BMap.Size(10, 10);
+                }
+
+                ZoomControl.prototype = new BMap.Control();
+                ZoomControl.prototype.initialize = function (map) {
+                  var div = document.createElement("div");
+                  var content = '<div id="heatmap_mark"><div><span class="heatmap_mark_title">颜色对应RSSI信号强度</span> <span class="heatmap_mark_text" style="float:right;padding-top:5px" id="heatmap_mark_density">dBm</span></div><div class="linear_color"></div><span class="heatmap_blue heatmap_mark_text heatmap_color_span">-60以下</span><span class="heatmap_green heatmap_mark_text heatmap_color_span">-60至-80</span><span class="heatmap_yellow heatmap_mark_text heatmap_color_span">-80至-100</span><span class="heatmap_red heatmap_mark_text heatmap_color_span">-100至-120</span><span class="heatmap_result_red heatmap_mark_text heatmap_color_span">-120以上</span></div>';
+                  div.innerHTML = content;
+
+                  that.map.getContainer().appendChild(div);
+                  return div;
+                }
+
+                var myZoomCtrl = new ZoomControl();
+                that.map.addControl(myZoomCtrl);
+
               } else if (fport == "33") {
                 var polyline = new BMap.Polyline(lineArray, {
                   enableEditing: false, 
