@@ -224,14 +224,12 @@ System.register(['lodash', './geohash'], function (_export, _context) {
           key: 'tableHandler',
           value: function tableHandler(tableData) {
             var datapoints = [];
-
             if (tableData.type === 'table') {
               var columnNames = {};
 
               tableData.columns.forEach(function (column, columnIndex) {
-                columnNames[columnIndex] = column.text;
+                columnNames[columnIndex] = column;
               });
-
               tableData.rows.forEach(function (row) {
                 var datapoint = {};
 
@@ -243,7 +241,6 @@ System.register(['lodash', './geohash'], function (_export, _context) {
                 datapoints.push(datapoint);
               });
             }
-
             return datapoints;
           }
         }]);

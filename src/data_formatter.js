@@ -114,14 +114,12 @@ export default class DataFormatter {
 
   static tableHandler(tableData) {
     const datapoints = [];
-
     if (tableData.type === 'table') {
       const columnNames = {};
 
       tableData.columns.forEach((column, columnIndex) => {
-        columnNames[columnIndex] = column.text;
+        columnNames[columnIndex] = column;
       });
-
       tableData.rows.forEach((row) => {
         const datapoint = {};
 
@@ -133,7 +131,6 @@ export default class DataFormatter {
         datapoints.push(datapoint);
       });
     }
-
     return datapoints;
   }
 

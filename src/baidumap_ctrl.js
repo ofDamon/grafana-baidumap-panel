@@ -96,6 +96,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     if (this.dashboard.snapshot && this.locations) {
       this.panel.snapshotLocationData = this.locations;
     }
+    
     const data = [];
     if (this.panel.locationData === "geohash") {
       this.dataFormatter.setGeohashValues(dataList, data);
@@ -103,8 +104,11 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       const tableData = dataList.map(DataFormatter.tableHandler.bind(this));
       this.dataFormatter.setTableValues(tableData, data);
     } else if (this.panel.locationData === "json result") {
-      this.series = dataList;
-      this.dataFormatter.setJsonValues(data);
+      _.map(dataList, list => {
+        data.push(list.datapoints)
+      })
+      //this.series = dataList;
+      //this.dataFormatter.setJsonValues(data);
     } else {
       const tableData = dataList.map(DataFormatter.tableHandler.bind(this));
       this.dataFormatter.setTableValues(tableData, data);
@@ -139,7 +143,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
     let scontent = "";
     scontent += '<a href=""><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
     scontent += '<div class="infobox-header"><div class="infobox-header-icon"><img src="public/plugins/grafana-baidumap-panel/images/pins6.png"></div>';
-    scontent += '<div class="infobox-header-name"><p>'+data.nodeid+'</p></div>';
+    scontent += '<div class="infobox-header-name"><p>'+data.devEUI+'</p></div>';
     scontent += '<div class="infobox-header-type" style="min-width:250px"><p>'+data.type+'</p></div></div>';
     scontent += '<div class="infobox-footer">在线时间：10分钟前</div>';
     scontent += '<div class="infobox-footer-right"></div></div><div class="arrow"></div></div></a>';

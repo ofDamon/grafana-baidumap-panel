@@ -175,6 +175,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             if (this.dashboard.snapshot && this.locations) {
               this.panel.snapshotLocationData = this.locations;
             }
+
             var data = [];
             if (this.panel.locationData === "geohash") {
               this.dataFormatter.setGeohashValues(dataList, data);
@@ -182,8 +183,11 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               var tableData = dataList.map(DataFormatter.tableHandler.bind(this));
               this.dataFormatter.setTableValues(tableData, data);
             } else if (this.panel.locationData === "json result") {
-              this.series = dataList;
-              this.dataFormatter.setJsonValues(data);
+              _.map(dataList, function (list) {
+                data.push(list.datapoints);
+              });
+              //this.series = dataList;
+              //this.dataFormatter.setJsonValues(data);
             } else {
               var _tableData = dataList.map(DataFormatter.tableHandler.bind(this));
               this.dataFormatter.setTableValues(_tableData, data);
@@ -219,7 +223,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
             var scontent = "";
             scontent += '<a href=""><div class="infobox" id="infobox"><div class="infobox-content" style="display:block">';
             scontent += '<div class="infobox-header"><div class="infobox-header-icon"><img src="public/plugins/grafana-baidumap-panel/images/pins6.png"></div>';
-            scontent += '<div class="infobox-header-name"><p>' + data.nodeid + '</p></div>';
+            scontent += '<div class="infobox-header-name"><p>' + data.devEUI + '</p></div>';
             scontent += '<div class="infobox-header-type" style="min-width:250px"><p>' + data.type + '</p></div></div>';
             scontent += '<div class="infobox-footer">在线时间：10分钟前</div>';
             scontent += '<div class="infobox-footer-right"></div></div><div class="arrow"></div></div></a>';
