@@ -243,6 +243,29 @@ System.register(['lodash', './geohash'], function (_export, _context) {
             }
             return datapoints;
           }
+        }, {
+          key: 'tableHandlers',
+          value: function tableHandlers(tableData) {
+            var datapoints = [];
+            if (tableData.type === 'table') {
+              var columnNames = {};
+
+              tableData.columns.forEach(function (column, columnIndex) {
+                columnNames[columnIndex] = column.text;
+              });
+              tableData.rows.forEach(function (row) {
+                var datapoint = {};
+
+                row.forEach(function (value, columnIndex) {
+                  var key = columnNames[columnIndex];
+                  datapoint[key] = value;
+                });
+
+                datapoints.push(datapoint);
+              });
+            }
+            return datapoints;
+          }
         }]);
 
         return DataFormatter;

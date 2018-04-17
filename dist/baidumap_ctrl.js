@@ -183,14 +183,11 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               var tableData = dataList.map(DataFormatter.tableHandler.bind(this));
               this.dataFormatter.setTableValues(tableData, data);
             } else if (this.panel.locationData === "json result") {
-              _.map(dataList, function (list) {
-                data.push(list.datapoints);
-              });
-              //this.series = dataList;
-              //this.dataFormatter.setJsonValues(data);
-            } else {
-              var _tableData = dataList.map(DataFormatter.tableHandler.bind(this));
+              var _tableData = dataList.map(DataFormatter.tableHandlers.bind(this));
               this.dataFormatter.setTableValues(_tableData, data);
+            } else {
+              var _tableData2 = dataList.map(DataFormatter.tableHandler.bind(this));
+              this.dataFormatter.setTableValues(_tableData2, data);
             }
             //const datas = this.filterEmptyAndZeroValues(data);
 
@@ -252,10 +249,9 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
               var rawLength;
               var translatedElements;
               var i;
-              var i;
 
               (function () {
-                var translateOne = function translateOne(index, gps) {
+                var translateOne = function translateOne(index, gps, BMap) {
                   function translateCallback(returnedData) {
                     if (returnedData.status == 0) {
                       translatedElements.push({
@@ -325,6 +321,10 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                             strokeColor: "blue"
                           });
                           that.map.addOverlay(polyline);
+                        } else {
+                          for (var _i in lineArray) {
+                            that.addMarker(lineArray[_i], BMap, gps);
+                          }
                         }
                       }
                     } else {
@@ -339,29 +339,22 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                 var fport = _this2.data[0].fport;
                 var lineArray = [];
                 var heatArray = [];
+                var markerArray = [];
                 var convertor = new BMap.Convertor();
 
                 rawLength = 0;
                 translatedElements = [];
 
-                if (fport != "5" && fport != "33") {
-                  for (i = 0; i < list.length; i++) {
-                    if (list[i].lng > 0 && list[i].lat > 0) {
-                      var point = new BMap.Point(list[i].lng, list[i].lat);
-                      that.addMarker(point, BMap, list[i]);
-                    }
-                  }
-                } else {
-                  for (i = 0; i < list.length; i++) {
-                    setTimeout(function (index) {
-                      return function () {
-                        if (list[index].lng > 0 && list[index].lat > 0) {
-                          rawLength++;
-                          translateOne(index, list[index]);
-                        }
-                      };
-                    }(i), i * 10);
-                  }
+
+                for (i = 0; i < list.length; i++) {
+                  setTimeout(function (index) {
+                    return function () {
+                      if (list[index].lng > 0 && list[index].lat > 0) {
+                        rawLength++;
+                        translateOne(index, list[index], BMap);
+                      }
+                    };
+                  }(i), i * 10);
                 }
               })();
             }

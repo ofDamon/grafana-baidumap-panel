@@ -104,11 +104,8 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       const tableData = dataList.map(DataFormatter.tableHandler.bind(this));
       this.dataFormatter.setTableValues(tableData, data);
     } else if (this.panel.locationData === "json result") {
-      _.map(dataList, list => {
-        data.push(list.datapoints)
-      })
-      //this.series = dataList;
-      //this.dataFormatter.setJsonValues(data);
+      const tableData = dataList.map(DataFormatter.tableHandlers.bind(this));
+      this.dataFormatter.setTableValues(tableData, data);
     } else {
       const tableData = dataList.map(DataFormatter.tableHandler.bind(this));
       this.dataFormatter.setTableValues(tableData, data);
@@ -169,31 +166,24 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
       const fport = this.data[0].fport;
       const lineArray = [];
       const heatArray = [];
+      const markerArray = [];
       const convertor = new BMap.Convertor();
 
       var rawLength = 0;
       var translatedElements = [];
-      if(fport != "5" && fport != "33"){
-        for (var i = 0; i < list.length; i++) {
-          if (list[i].lng > 0 && list[i].lat > 0) {
-            const point = new BMap.Point(list[i].lng, list[i].lat);
-            that.addMarker(point, BMap, list[i]);
-          }
-        }
-      }else{
-        for (var i = 0; i < list.length; i++) {
-          setTimeout(function (index) {
-            return function () {
-              if (list[index].lng > 0 && list[index].lat > 0) {
-                rawLength++;
-                translateOne(index, list[index]);
-              }
+
+      for (var i = 0; i < list.length; i++) {
+        setTimeout(function (index) {
+          return function () {
+            if (list[index].lng > 0 && list[index].lat > 0) {
+              rawLength++;
+              translateOne(index, list[index], BMap);
             }
-          }(i), i * 10);
-        }
+          }
+        }(i), i * 10);
       }
 
-      function translateOne(index, gps) {
+      function translateOne(index, gps, BMap) {
         function translateCallback(returnedData) {
           if (returnedData.status == 0) {
             translatedElements.push({
@@ -264,6 +254,10 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
                   strokeColor: "blue"
                 });
                 that.map.addOverlay(polyline);
+              } else {
+                for(const i in lineArray){
+                  that.addMarker(lineArray[i], BMap, gps);
+                }
               }
             }
           } else {

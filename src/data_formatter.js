@@ -134,6 +134,28 @@ export default class DataFormatter {
     return datapoints;
   }
 
+  static tableHandlers(tableData) {
+    const datapoints = [];
+    if (tableData.type === 'table') {
+      const columnNames = {};
+
+      tableData.columns.forEach((column, columnIndex) => {
+        columnNames[columnIndex] = column.text;
+      });
+      tableData.rows.forEach((row) => {
+        const datapoint = {};
+
+        row.forEach((value, columnIndex) => {
+          const key = columnNames[columnIndex];
+          datapoint[key] = value;
+        });
+
+        datapoints.push(datapoint);
+      });
+    }
+    return datapoints;
+  }
+
   setTableValues(tableData, data) {
     if (tableData && tableData.length > 0) {
       let highestValue = 0;
