@@ -259,6 +259,7 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                         point: returnedData.points[0],
                         rssi: gps.rssi
                       });
+                      markerArray.push({ point: returnedData.points[0], data: gps });
 
                       if (translatedElements.length == rawLength) {
                         translatedElements.sort(function (a, b) {
@@ -322,8 +323,8 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
                           });
                           that.map.addOverlay(polyline);
                         } else {
-                          for (var _i in lineArray) {
-                            that.addMarker(lineArray[_i], BMap, gps);
+                          for (var _i in markerArray) {
+                            that.addMarker(markerArray[_i].point, BMap, markerArray[_i].data);
                           }
                         }
                       }

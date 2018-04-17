@@ -191,6 +191,7 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
               point: returnedData.points[0],
               rssi: gps.rssi
             });
+            markerArray.push({point: returnedData.points[0], data: gps});
 
             if (translatedElements.length == rawLength) {
               translatedElements.sort(function (a, b) {
@@ -255,8 +256,8 @@ export default class BaidumapCtrl extends MetricsPanelCtrl {
                 });
                 that.map.addOverlay(polyline);
               } else {
-                for(const i in lineArray){
-                  that.addMarker(lineArray[i], BMap, gps);
+                for(const i in markerArray){
+                  that.addMarker(markerArray[i].point, BMap, markerArray[i].data);
                 }
               }
             }
